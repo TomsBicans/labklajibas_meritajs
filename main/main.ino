@@ -16,10 +16,13 @@ namespace util
     {
         return max(lower, min(n, upper));
     }
-    unsigned char *char_arr(int size)
+    char *char_arr(int size)
     {
         size = clamp(size, 0, abs(size));
-        unsigned char *t = new unsigned char[size + 1];
+        char *t = new char[size + 1];
+        for (int i=0; i<size; i++){
+          t[i] = "\0";
+        }
         t[size] = "\0";
         return t;
     }
@@ -81,7 +84,7 @@ private:
     LiquidCrystal_I2C *scrn;
     int w;
     int h;
-    unsigned char **grid;
+    char **grid;
 
 public:
     Screen(LiquidCrystal_I2C *scrn = NULL, int w = 1, int h = 1)
@@ -91,9 +94,9 @@ public:
         this->scrn = scrn;
         this->grid = __generate_grid(w, h);
     }
-    unsigned char **__generate_grid(int w, int h)
+    char **__generate_grid(int w, int h)
     {
-        unsigned char **res = new unsigned char *[h];
+        char **res = new char *[h];
         for (int i = 0; i < this->h; i++)
         {
             res[i] = util::char_arr(w);
@@ -101,46 +104,62 @@ public:
         return res;
     }
 
-    void put(int w_x, int h_x, unsigned char val)
-    {
-        w_x = util::clamp(w_x, 0, (this->w) - 1);
-        h_x = util::clamp(h_x, 0, (this->h) - 1);
-        this->grid[w_x][h_x] = val;
+    void debug_screen_val(int i, int j, const char *loc){
+      Serial.print("idx loc:");
+      Serial.print(i);
+      Serial.print(' ');
+      Serial.print(j);
+      Serial.print("  Value:");
+      Serial.print(*loc);
+      Serial.print("Address:");
+      Serial.print(*loc, HEX);
     }
 
-    void init()
+    void put(int i, int j, const char val)
     {
-        // Set every screen char position to _
+      // i: column idx
+      // j: row idx
+        i = util::clamp(i, 0, (this->h));
+        j = util::clamp(j, 0, (this->w));
+        this->grid[i][j] = val;
+    }
+
+    void put(int i, int j, char *arr)
+    {
+      int text_len = strlen(arr);
+      int max_count = this->w - j;
+      if (text_len > max_count){
+        text_len = max_count;
+      }
+      int idx = 0;
+      for (int col = j; col<j+text_len; col++){
+        this->grid[i][col] = arr[idx];
+        idx++;
+      }
+    }
+
+    void fill(char symbol)
+    {
+        // Set every screen char position to a default symbol.
         for (int i = 0; i < this->h; i++)
         {
             for (int j = 0; j < this->w; j++)
             {
-                put(i, j, "_");
+                this->put(i, j, symbol);
             }
         }
     }
 
-    // int &operator[](int index)
-    // {
-    //     // int idx = util::clamp(index, 0, this->size - 1);
-    //     return this->grid[index];
-    // }
+    ~Screen()
+    {
+        for (int i = 0; i < this->h; i++)
+        {
+            delete[] this->grid[i];
+        }
+        delete [] this->grid;
+    }
 
-    // void print()
-    // {
-    //     for (int i = 0; i < this->h; i++)
-    //     {
-    //         Serial.print("LINE ");
-    //         Serial.print(i);
-    //         Serial.print(": ");
-    //         for (int j = 0; j < this->w; j++)
-    //         {
-    //             Serial.print("X");
-    //         }
-    //         Serial.print("\n");
-    //     }
-    //     Serial.print("\n");
-    // }
+
     void print()
     {
         for (int i = 0; i < this->h; i++)
@@ -148,6 +167,7 @@ public:
             Serial.print("LINE ");
             Serial.print(i);
             Serial.print(": ");
+            // Serial.print(this->grid[i]);
             for (int j = 0; j < this->w; j++)
             {
                 Serial.print(this->grid[i][j]);
@@ -182,12 +202,22 @@ void arr_test()
     Serial.print(res);
     Serial.print("\n");
 }
-
+int n = 0;
 void loop()
 {
     // put your main code here, to run repeatedly:
-    Screen s(NULL, 16, 2);
-    s.init();
+    // Screen *s = new Screen(0x40, 16, 2);
+    // delete s;
+    Serial.print(n);
+    Serial.print("\n");
+    Screen s(NULL, 30, 4);
+    s.fill('-');
+    s.put(1, 5, 'T');
+    s.put(1, 6, 'E');
+    s.put(1, 7, 'S');
+    s.put(1, 8, 'T');
+    s.put(2, 0, "HELLO");
     s.print();
-    delay(1000);
+    delay(2000);
+    n++;
 }
