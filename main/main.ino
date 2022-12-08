@@ -26,7 +26,57 @@ namespace util
         t[size] = "\0";
         return t;
     }
+    long int benchmark(long int t1){
+      long int t2 = millis();
+      return t2 - t1;
+    }
 
+    void benchmark(long int t1, long int t2){
+      return t2 - t1;
+    }
+    int find_screen(){
+        byte error, address;
+        int nDevices;
+        int res = 0;        
+
+        Serial.println("Scanning...");
+
+        nDevices = 0;
+        for (address = 1; address < 127; address++ ) {
+          Wire.begin();
+          Wire.beginTransmission(address);
+          error = Wire.endTransmission();
+          if (error == 0) {
+            Serial.print("I2C device found at address 0x");
+            if (address < 16)
+              Serial.print("0");
+            Serial.print(address, HEX);
+            Serial.println("  !");
+            res++;
+            nDevices++;
+          }
+          else if (error == 4) {
+            Serial.print("Unknown error at address 0x");
+            if (address < 16)
+              Serial.print("0");
+            Serial.println(address, HEX);
+          }
+        }
+        if (res == 0){
+          Serial.println("No I2C devices found\n");
+          return 0;
+        }
+        else{
+          Serial.println("done\n");
+          return res;
+        }}
+};
+
+namespace print
+{
+    void total_time(long int dif){
+      Serial.print("Setup time: "); Serial.print(dif); Serial.println(" milliseconds");
+    }
 };
 
 class Array
@@ -81,17 +131,17 @@ public:
 class Screen
 {
 private:
-    LiquidCrystal_I2C *scrn;
+    LiquidCrystal_I2C *LCD;
     int w;
     int h;
     char **grid;
 
 public:
-    Screen(LiquidCrystal_I2C *scrn = NULL, int w = 1, int h = 1)
+    Screen(LiquidCrystal_I2C *screen, int w = 1, int h = 1)
     {
         this->w = util::clamp(w, 0, 100);
         this->h = util::clamp(h, 0, 100);
-        this->scrn = scrn;
+        this->LCD = screen;
         this->grid = __generate_grid(w, h);
     }
     char **__generate_grid(int w, int h)
@@ -104,17 +154,6 @@ public:
         return res;
     }
 
-    void debug_screen_val(int i, int j, const char *loc){
-      Serial.print("idx loc:");
-      Serial.print(i);
-      Serial.print(' ');
-      Serial.print(j);
-      Serial.print("  Value:");
-      Serial.print(*loc);
-      Serial.print("Address:");
-      Serial.print(*loc, HEX);
-    }
-
     void put(int i, int j, const char val)
     {
       // i: column idx
@@ -124,7 +163,7 @@ public:
         this->grid[i][j] = val;
     }
 
-    void put(int i, int j, char *arr)
+    int put(int i, int j, char *arr)
     {
       int text_len = strlen(arr);
       int max_count = this->w - j;
@@ -137,6 +176,10 @@ public:
         idx++;
       }
     }
+    int put_num(int i, int j, float num){
+      this->LCD->setCursor(j, i);
+      this->LCD->print(num);
+    }
 
     void fill(char symbol)
     {
@@ -146,6 +189,16 @@ public:
             for (int j = 0; j < this->w; j++)
             {
                 this->put(i, j, symbol);
+            }
+        }
+    }
+    void write_buf_to_screen(){
+        for (int i = 0; i < this->h; i++)
+        {
+            for (int j = 0; j < this->w; j++)
+            {
+                this->LCD->setCursor(j, i);
+                this->LCD->print(this->grid[i][j]);
             }
         }
     }
@@ -167,7 +220,6 @@ public:
             Serial.print("LINE ");
             Serial.print(i);
             Serial.print(": ");
-            // Serial.print(this->grid[i]);
             for (int j = 0; j < this->w; j++)
             {
                 Serial.print(this->grid[i][j]);
@@ -185,9 +237,31 @@ class ScreenManager
     }
 };
 
+// Global variables
+// Screens:
+LiquidCrystal_I2C lcd1(0x27, 16, 2);
+
+//
 void setup()
 {
+    long int start = millis();
     util::init_serial();
+    // Find screens
+    int count = 0;
+    while ((count = util::find_screen()) < 1){
+      Serial.print("Screens found: "); Serial.println(count);
+      delay(2000);
+    }
+    Serial.print("SCREEN COUNT: "); Serial.println(count);
+    // Initialize screens.
+    lcd1.init();
+    lcd1.backlight();
+    // Initialize sensors.
+    // Initialize result storage.
+
+    // Benchmark stats.
+    long int total = util::benchmark(start);
+    print::total_time(total);
 }
 
 void arr_test()
@@ -208,16 +282,30 @@ void loop()
     // put your main code here, to run repeatedly:
     // Screen *s = new Screen(0x40, 16, 2);
     // delete s;
+    long int start = millis();    
     Serial.print(n);
     Serial.print("\n");
-    Screen s(NULL, 30, 4);
-    s.fill('-');
-    s.put(1, 5, 'T');
-    s.put(1, 6, 'E');
-    s.put(1, 7, 'S');
-    s.put(1, 8, 'T');
-    s.put(2, 0, "HELLO");
-    s.print();
-    delay(2000);
+    // lcd1.setCursor(0, 0);
+    // lcd1.print("ABC");
+    Screen s(&lcd1, 16, 2);
+    // s.fill('-');
+    // s.put(1, 5, 'T');
+    // s.put(1, 6, 'E');
+    // s.put(1, 7, 'S');
+    // s.put(1, 8, 'T');
+    // s.put(1, 26, "HELLO");
+    // s.put(1, 0, "HELLO");
+
+    // s.put(0, 0, "HI, the weather today was cloudy, but is sunny now.");
+    // s.put_num(0, 0, 1337.883);
+    // s.print();
+    // s.write_buf_to_screen();
+    lcd1.setCursor(0, 0);
+    lcd1.print(123123.86);
+    delay(1000);
     n++;
+
+    // Benchmark stats.
+    long int total = util::benchmark(start);
+    print::total_time(total-1000);
 }
