@@ -1,10 +1,17 @@
 // LCD DISPLEJS
+#include <stdio.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include <DHT.h>
 #include "LinkedList.h"
 #include "LCD_config.h"
-#include <stdio.h>
-// #include <MemoryFree.h>
+#include "Timer.h"
+#include "Messages.h"
+
+// Defines
+#define DHT_PIN 7
+#define DHT_TYPE DHT22
+#define NOISE_PIN 6
 
 
 namespace util{
@@ -76,13 +83,40 @@ namespace util{
           if (!suppress_msg) Serial.println("done\n");
           return devices;
         }}
-    void printLcd(lcd_config config, char text[]) {
+    int printLcd(lcd_config config, char text[]) {
+      // Return the number of symbols written on the screen.
+      config.lcd.clear();
       int numCols = config.columns; // Assume a 16-column LCD screen
       int numRows = config.rows; // Assume a 2-row LCD screen
       int textLen = strlen(text); // Get the length of the text array
       int col = 0, row = 0; // Start at the first column and first row
-
+      int written = 0;
       for (int i = 0; i < textLen; i++) {
+        written++;
+        // if (text[i] == ' ') {
+        //   // Calculate the length of the next word
+        //   int nextWordLength = 0;
+        //   for (int j = i + 1; j < textLen; j++) {
+        //     if (text[j] == ' ') {
+        //       break;
+        //     }
+        //     nextWordLength++;
+        //   }
+
+        //   // Check if the next word would fit on the current line
+        //   if (col + nextWordLength >= config.columns) {
+        //     // Move to the next line
+        //     col = 0;
+        //     row++;
+        //     if (row >= numRows){
+        //       // written--;
+        //       break;              
+        //     }
+        //     i++;
+        //     config.lcd.setCursor(col, row);
+        //   }
+        // }
+
         if (text[i] == '\n') { // If a newline character is found
           col = 0; // Reset the column to 0
           row++; // Increment the row
@@ -102,11 +136,42 @@ namespace util{
           }
         }
       }
+      return written;
     }
-    void f2str(float value, char *result) {
+    char* f2str(float value, char *result) {
       // Convert the floating-point number to a string with two decimal places
       // and a minimum width of 8 characters (including the decimal point and the sign)
       dtostrf(value, 2, 1, result);
+      return result;
+    }
+
+    int countWords(char *str) {
+      // Function that counts the number of words in a char array
+      int count = 0;  // Word count
+
+      // Use strtok() to split the char array into individual words
+      char *token = strtok(str, " ");
+      while (token != NULL) {
+        // Increment the word count
+        count++;
+
+        // Get the next word in the char array
+        token = strtok(NULL, " ");
+      }
+
+      // Return the word count
+      return count;
+    }
+    void display_whole_text_LCD(lcd_config config, char text[]){
+      // Display the whole text in LCD screen, even if the whole text does not fit on the screen at once.
+      int total_length = strlen(text);
+      int printed_c = util::printLcd(config, text);
+      while (printed_c < total_length){
+        Serial.println(printed_c);
+        delay(2000);
+        printed_c += util::printLcd(config, text+printed_c);
+      }
+      delay(2000);
     }
 };
 
@@ -115,19 +180,18 @@ namespace print{
     void total_time(long int dif){
       Serial.print("Total loop time: "); Serial.print(dif); Serial.println(" milliseconds");
     }
-  //   void printFreeMemory() {
-  //   // Print the amount of free memory to the serial monitor
-  //   Serial.print("Free memory: ");
-  //   Serial.print(freeMemory());
-  //   Serial.println(" bytes");
-  // }
+};
+
+namespace sensors{
+  
 };
 
 // GLOBAL VARIABLES
 // SCREENS:
 LiquidCrystal_I2C lcd1(0x27, 16, 2);
-
 lcd_config lcd1_conf = {lcd1, 16, 2};
+// SENSORS
+DHT dht_sensor = DHT(DHT_PIN, DHT_TYPE);
 //
 void setup()
 {
@@ -136,19 +200,30 @@ void setup()
     // Find screens
     int count = 0;
     while ((count = util::find_I2C_devices(false).getSize()) < 1){
-      Serial.print("Screens found: "); Serial.println(count);
-      delay(2000);
+      Serial.print("Screens found: "); Serial.println(count); delay(2000);
     }
     Serial.print("SCREEN COUNT: "); Serial.println(count);
     // Initialize screens.
-    lcd1.init();
-    lcd1.backlight();
+    lcd1.init(); lcd1.backlight();
     // Initialize sensors.
+    dht_sensor.begin();
+    pinMode(NOISE_PIN, INPUT);
     // Initialize result storage.
 
-    // Benchmark stats.
+    // Setup total time.
     long int total = util::benchmark(start);
     print::total_time(total);
+    // User interaction.
+    bool skipintro = true;
+    if (!skipintro){
+      char buffer[300];
+      Timer timer = Timer(10*1000);
+      sprintf(buffer, MSG_EN_GREET);
+      while (!timer.hasElapsed()){ util::display_whole_text_LCD(lcd1_conf, buffer); continue;}
+      timer.reset(10*1000);
+      sprintf(buffer, MSG_EN_INSTRUCTIONS);
+      while (!timer.hasElapsed()){ util::display_whole_text_LCD(lcd1_conf, buffer); continue;}
+    }
 }
 
 int n = 0;
@@ -156,24 +231,43 @@ void loop()
 {
     // put your main code here, to run repeatedly:
     long int start = millis();
-    LinkedList<int> devices = util::find_I2C_devices();
-    // lcd1.print(devices.getFirst(), HEX);
-    
+    // LinkedList<int> devices = util::find_I2C_devices();
+    char buffer[300];
+    // sprintf(buffer, "Labdien. Sis ir labklajibas meritajs.");
     char tmp[10];
     // util::f2str(12.3+((float)n/2.1), tmp);
-    util::f2str(99.7, tmp);
-    char buffer[100];
+    float score = 90 + (float)random(0,100)/10;
+    util::f2str(score, tmp);
     // sprintf(buffer, "BRUH %s Moment TOP %d %d %d", tmp, n*2, n*5, n*3);
-    sprintf(buffer, "Time: %ds V:%s\nVertejums: %s", n, "1",tmp);
+    // sprintf(buffer, "Time: %ds V:%s\nScore: %s", n, "1",tmp);
     Serial.println(buffer);
-    util::printLcd(lcd1_conf, buffer);
-    delay(1000);
-    
-    for (LinkedList<int>::Node* it = devices.getHead(); it != nullptr; it = it->next) {
-      Serial.print(it->data);
-      Serial.print(" ");
-    }
-    Serial.print("\n");
+    // util::printLcd(lcd1_conf, buffer);
+    float temperature = dht_sensor.readTemperature();delay(500);
+    float humidity = dht_sensor.readHumidity();delay(500);
+    char tmp_temp[10];
+    char tmp_hum[10];
+    sprintf(buffer, "Temp: %s (*C)\nHum: %s (%%)", util::f2str(temperature, tmp_temp), util::f2str(humidity, tmp_hum));
+    util::display_whole_text_LCD(lcd1_conf, buffer);
+    // delay(1000);
+
+    // Timer t = Timer(10*1000);
+    // unsigned long last_event = 0;
+    // while(!t.hasElapsed()){
+    //     int noise_data = digitalRead(NOISE_PIN);
+    //     if (noise_data == LOW){
+    //       if (millis() - last_event > 25) {
+    //         util::printLcd(lcd1_conf, "CLAP DETECTED");
+    //         delay(100);
+    //       }
+    //       last_event = millis();
+    //     }
+    //     lcd1_conf.lcd.clear();
+    // }
+    // for (LinkedList<int>::Node* it = devices.getHead(); it != nullptr; it = it->next) {
+    //   Serial.print(it->data);
+    //   Serial.print(" ");
+    // }
+    // Serial.print("\n");
 
     // Benchmark stats.
     n++;
