@@ -69,6 +69,7 @@ class LinkedList {
         delete node;
         size--;
       }
+      size = 0;
       tail = nullptr;
     }
 
