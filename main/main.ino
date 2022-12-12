@@ -3,25 +3,33 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <DHT.h>
-#include "LinkedList.h"
+#include <SPI.h>
+#include <SD.h>
 #include "LCD_config.h"
-#include "Timer.h"
 #include "Messages.h"
+#include "Test.h"
 
 // Defines
-#define DHT_PIN 7
-#define DHT_TYPE DHT22
+#define USER_INPUT_PIN_1 3
+#define USER_INPUT_PIN_2 4
+#define SD_CS_PIN 10
 #define NOISE_PIN 6
+#define DHT_PIN 2
+#define DHT_TYPE DHT22
+#define AIR_QUAL_PIN 8
+
+//Typedefs
+typedef bool (*BoolFunc)();
 
 
 namespace util{
-    static void init_serial()
+    static void init_serial(unsigned int baud_rate=9600)
     {
-        Serial.begin(9600);
+        Serial.begin(baud_rate);
         while (!Serial)
             ;
         delay(300);
-        Serial.print("Start.\n");
+        Serial.println("Start");
     }
     int clamp(int n, int lower, int upper)
     {
@@ -93,30 +101,6 @@ namespace util{
       int written = 0;
       for (int i = 0; i < textLen; i++) {
         written++;
-        // if (text[i] == ' ') {
-        //   // Calculate the length of the next word
-        //   int nextWordLength = 0;
-        //   for (int j = i + 1; j < textLen; j++) {
-        //     if (text[j] == ' ') {
-        //       break;
-        //     }
-        //     nextWordLength++;
-        //   }
-
-        //   // Check if the next word would fit on the current line
-        //   if (col + nextWordLength >= config.columns) {
-        //     // Move to the next line
-        //     col = 0;
-        //     row++;
-        //     if (row >= numRows){
-        //       // written--;
-        //       break;              
-        //     }
-        //     i++;
-        //     config.lcd.setCursor(col, row);
-        //   }
-        // }
-
         if (text[i] == '\n') { // If a newline character is found
           col = 0; // Reset the column to 0
           row++; // Increment the row
@@ -173,6 +157,20 @@ namespace util{
       }
       delay(2000);
     }
+    void run_tests(lcd_config config, LinkedList<BoolFunc>& tests){
+      int size = tests.getSize();
+      int passed = 0;
+      char buffer[40];
+      for (LinkedList<BoolFunc>::Node* node = tests.getHead(); node != nullptr; node = node->next) {
+        bool result = node->data();
+        if (result){
+            passed++;      
+            sprintf(buffer, "Tests passed:\n%d/%d", passed, size);
+            util::printLcd(config, buffer);
+            Serial.println("Test passed.");
+        }
+      }      
+    }
 };
 
 
@@ -183,8 +181,54 @@ namespace print{
 };
 
 namespace sensors{
-  
+  float air_quality(int pin=AIR_QUAL_PIN, unsigned long sampletime_ms=10000){
+  //https://www.howmuchsnow.com/arduino/airquality/grovedust/
+  unsigned long duration;
+  unsigned long starttime;
+  unsigned long lowpulseoccupancy = 0;
+  float ratio = 0;
+  float concentration = 0;
+  Timer t = Timer(sampletime_ms);
+  while(!t.hasElapsed()){
+    duration = pulseIn(pin, LOW);
+    lowpulseoccupancy += duration;
+  }
+  ratio = lowpulseoccupancy/(sampletime_ms*10.0);
+  concentration = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62;
+  if (concentration <= 0.62){
+    return 0;
+  }
+  concentration *= 100; // Convert pcs/0.01cf => pcs/cf
+  concentration /= 0.0283168466; // Convert pcs/cf => pcs/m^3
+  concentration /= 1000; // Convert pcs/m^3 => pcs/L
+  return concentration;
+  }
 };
+
+namespace operation {
+    enum MODE {
+      OBS,
+      BENCH
+    };
+    MODE select_mode(unsigned long time_limit=10*1000, MODE default_mode=OBS){
+      MODE mode = default_mode;
+      Timer t = Timer(time_limit);
+      while(!t.hasElapsed()){
+          int tmp_mode = digitalRead(USER_INPUT_PIN_1);
+          if (tmp_mode == HIGH){
+            mode = OBS;
+            break;
+          }
+          tmp_mode = digitalRead(USER_INPUT_PIN_2);
+          if (tmp_mode == HIGH){
+            mode = BENCH;
+            break;
+          }
+          delay(20);
+      }
+      return mode;
+    }
+}
 
 // GLOBAL VARIABLES
 // SCREENS:
@@ -192,38 +236,54 @@ LiquidCrystal_I2C lcd1(0x27, 16, 2);
 lcd_config lcd1_conf = {lcd1, 16, 2};
 // SENSORS
 DHT dht_sensor = DHT(DHT_PIN, DHT_TYPE);
-//
+// BUFFERS
+
 void setup()
 {
     long int start = millis();
-    util::init_serial();
+    util::init_serial(9600);
     // Find screens
     int count = 0;
     while ((count = util::find_I2C_devices(false).getSize()) < 1){
       Serial.print("Screens found: "); Serial.println(count); delay(2000);
     }
-    Serial.print("SCREEN COUNT: "); Serial.println(count);
+    // Serial.print("SCREEN COUNT: "); Serial.println(count);
     // Initialize screens.
-    lcd1.init(); lcd1.backlight();
+    Serial.println("Initializing screens.");
+    lcd1.init(); 
+    lcd1.backlight();
     // Initialize sensors.
+    Serial.println("Initializing sensors.");
     dht_sensor.begin();
     pinMode(NOISE_PIN, INPUT);
+    pinMode(AIR_QUAL_PIN, INPUT);
+    pinMode(USER_INPUT_PIN_1, INPUT);
+
     // Initialize result storage.
+
+    // Tests
+    Serial.println("Running tests.");
+    LinkedList<BoolFunc> tests = LinkedList<BoolFunc>();
+    tests.add(testQueue);
+    tests.add(testLinkedList);
+    util::run_tests(lcd1_conf,tests);
 
     // Setup total time.
     long int total = util::benchmark(start);
     print::total_time(total);
+    Serial.println("Setup done.");
     // User interaction.
     bool skipintro = true;
     if (!skipintro){
-      char buffer[300];
+      char TEXT_BUFFER[300];
       Timer timer = Timer(10*1000);
-      sprintf(buffer, MSG_EN_GREET);
-      while (!timer.hasElapsed()){ util::display_whole_text_LCD(lcd1_conf, buffer); continue;}
+      sprintf(TEXT_BUFFER, MSG_EN_GREET);
+      while (!timer.hasElapsed()){ util::display_whole_text_LCD(lcd1_conf, TEXT_BUFFER); continue;}
       timer.reset(10*1000);
-      sprintf(buffer, MSG_EN_INSTRUCTIONS);
-      while (!timer.hasElapsed()){ util::display_whole_text_LCD(lcd1_conf, buffer); continue;}
+      sprintf(TEXT_BUFFER, MSG_EN_INSTRUCTIONS);
+      while (!timer.hasElapsed()){ util::display_whole_text_LCD(lcd1_conf, TEXT_BUFFER); continue;}
     }
+    delay(1500);
 }
 
 int n = 0;
@@ -231,47 +291,42 @@ void loop()
 {
     // put your main code here, to run repeatedly:
     long int start = millis();
-    // LinkedList<int> devices = util::find_I2C_devices();
-    char buffer[300];
-    // sprintf(buffer, "Labdien. Sis ir labklajibas meritajs.");
-    char tmp[10];
-    // util::f2str(12.3+((float)n/2.1), tmp);
-    float score = 90 + (float)random(0,100)/10;
-    util::f2str(score, tmp);
-    // sprintf(buffer, "BRUH %s Moment TOP %d %d %d", tmp, n*2, n*5, n*3);
-    // sprintf(buffer, "Time: %ds V:%s\nScore: %s", n, "1",tmp);
-    Serial.println(buffer);
-    // util::printLcd(lcd1_conf, buffer);
-    float temperature = dht_sensor.readTemperature();delay(500);
-    float humidity = dht_sensor.readHumidity();delay(500);
-    char tmp_temp[10];
-    char tmp_hum[10];
-    sprintf(buffer, "Temp: %s (*C)\nHum: %s (%%)", util::f2str(temperature, tmp_temp), util::f2str(humidity, tmp_hum));
-    util::display_whole_text_LCD(lcd1_conf, buffer);
-    // delay(1000);
+    char TEXT_BUFFER[80];
 
-    // Timer t = Timer(10*1000);
-    // unsigned long last_event = 0;
-    // while(!t.hasElapsed()){
-    //     int noise_data = digitalRead(NOISE_PIN);
-    //     if (noise_data == LOW){
-    //       if (millis() - last_event > 25) {
-    //         util::printLcd(lcd1_conf, "CLAP DETECTED");
-    //         delay(100);
-    //       }
-    //       last_event = millis();
-    //     }
-    //     lcd1_conf.lcd.clear();
-    // }
-    // for (LinkedList<int>::Node* it = devices.getHead(); it != nullptr; it = it->next) {
-    //   Serial.print(it->data);
-    //   Serial.print(" ");
-    // }
-    // Serial.print("\n");
+    sprintf(TEXT_BUFFER, "Selecting mode\nOBS: B1 BEN: B2");
+    util::printLcd(lcd1_conf, TEXT_BUFFER);
+    operation::MODE mode = operation::select_mode(2*1000, operation::OBS);
+    if (mode == operation::OBS){
+      sprintf(TEXT_BUFFER, "Obs mode selected, cycle: %d", n);
+      util::printLcd(lcd1_conf, TEXT_BUFFER);
+      delay(2000);
+      sprintf(TEXT_BUFFER, "Measuring temperature and humidity.");
+      util::printLcd(lcd1_conf, TEXT_BUFFER);
+      delay(800);
+      float temperature = dht_sensor.readTemperature();delay(500);
+      float humidity = dht_sensor.readHumidity();delay(500);
+      char tmp_temp[10];
+      char tmp_hum[10];
+      sprintf(TEXT_BUFFER, "Temp: %s (*C)\nHum: %s (%%)", util::f2str(temperature, tmp_temp), util::f2str(humidity, tmp_hum));
+      util::display_whole_text_LCD(lcd1_conf, TEXT_BUFFER);
+      delay(2000);
 
+      sprintf(TEXT_BUFFER, "Measuring air quality...");
+      util::printLcd(lcd1_conf, TEXT_BUFFER);
+      float particle_concentration = sensors::air_quality(AIR_QUAL_PIN, 10000);
+      char tmp_particle[10];
+      sprintf(TEXT_BUFFER, "Conc: %s pcs/L", util::f2str(particle_concentration, tmp_particle));
+      util::display_whole_text_LCD(lcd1_conf, TEXT_BUFFER);
+    }
+    else if (mode == operation::BENCH) {
+      sprintf(TEXT_BUFFER, "Benchmark mode selected.");
+      delay(2000);
+      util::display_whole_text_LCD(lcd1_conf, TEXT_BUFFER);
+    }
+    delay(4000);
     // Benchmark stats.
     n++;
     long int total = util::benchmark(start);
-    // print::printFreeMemory();
-    print::total_time(total-1000);
+    Serial.print(n); Serial.print(" ");
+    print::total_time(total);
 }
