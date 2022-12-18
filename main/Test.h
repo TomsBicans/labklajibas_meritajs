@@ -2,6 +2,7 @@
 #include "LinkedList.h"
 #include "Queue.h"
 #include "Timer.h"
+#include "Measurement.h"
 
 // Test the queue class implementation
 bool testQueue()
@@ -110,3 +111,74 @@ bool testLinkedList(){
   assert(list.isEmpty() == true);
   return true;
 }
+
+void test_entry_struct() {
+  // create an entry struct
+  measurement::entry e{};
+
+  // check that the fields are set to the expected default values
+  assert(e.atm_temperature == measurement::NOVAL);
+  assert(e.atm_air_pressure == measurement::NOVAL);
+  assert(e.atm_air_particle == measurement::NOVAL);
+  assert(e.atm_CO2_ammount == measurement::NOVAL);
+  assert(e.atm_sound_pressure == measurement::NOVAL);
+  assert(e.UV_intensity == measurement::NOVAL);
+  assert(e.quality_rating == 100);
+  assert(e.user_likes == measurement::LIKES::UNKNOWN);
+  return true;
+}
+
+void test_entry_struct_values() {
+  // create an entry struct
+  measurement::entry e{};
+
+  // set the values of some of the fields
+  e.atm_temperature = 15.5;
+  e.atm_air_pressure = 1013.2;
+  e.atm_air_particle = 0.8;
+  e.atm_CO2_ammount = 400;
+  e.atm_sound_pressure = 70;
+
+  // check that the fields have the expected values
+  assert(e.atm_temperature == 15.5);
+  assert(e.atm_air_pressure == 1013.2);
+  assert(e.atm_air_particle == 0.8);
+  assert(e.atm_CO2_ammount == 400);
+  assert(e.atm_sound_pressure == 70);
+
+  // check that the other fields still have the default values
+  assert(e.UV_intensity == measurement::NOVAL);
+  assert(e.quality_rating == 100);
+  assert(e.user_likes == measurement::LIKES::UNKNOWN);
+  return true;
+}
+
+void test_entry_struct_addition() {
+  // create an entry struct
+  measurement::entry e1{};
+  measurement::entry e2{};
+  measurement::entry e3{};
+  // set the values of some of the fields
+  e1.atm_temperature = 50;
+  e1.atm_air_pressure = 50;
+  e1.atm_air_particle = 50;
+  e1.atm_CO2_ammount = 50;
+  e1.atm_sound_pressure = 50;
+
+  e2.atm_temperature = 50;
+  e2.atm_air_pressure = 50;
+  e2.atm_air_particle = 50;
+  e2.atm_CO2_ammount = 50;
+  e2.atm_sound_pressure = 50;
+
+  e3 = e1 + e2;
+
+  // check that the fields have the expected values
+  assert(e1.atm_temperature == 100);
+  assert(e1.atm_air_pressure == 100);
+  assert(e1.atm_air_particle == 100);
+  assert(e1.atm_CO2_ammount == 100);
+  assert(e1.atm_sound_pressure == 100);
+  return true;
+}
+

@@ -11,12 +11,13 @@
 
 // Defines
 #define USER_INPUT_PIN_1 3
-#define USER_INPUT_PIN_2 4
-#define SD_CS_PIN 10
+#define USER_INPUT_PIN_2 5
+#define SD_CS_PIN 4
 #define NOISE_PIN 6
 #define DHT_PIN 2
 #define DHT_TYPE DHT22
 #define AIR_QUAL_PIN 8
+#define BUZZER_PIN 9
 
 //Typedefs
 typedef bool (*BoolFunc)();
@@ -164,13 +165,25 @@ namespace util{
       for (LinkedList<BoolFunc>::Node* node = tests.getHead(); node != nullptr; node = node->next) {
         bool result = node->data();
         if (result){
-            passed++;      
+            passed++;
             sprintf(buffer, "Tests passed:\n%d/%d", passed, size);
             util::printLcd(config, buffer);
             Serial.println("Test passed.");
         }
+
       }      
     }
+    bool float_compare(float x, float y, float tolerance) {
+      if (abs(x - y) < tolerance) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    void write_measurement_to_file(File file, measurement::entry data){
+      file.write((byte*)&data, sizeof(data));
+    }
+    // void read_avg_from_file(File f, )
 };
 
 
@@ -181,28 +194,46 @@ namespace print{
 };
 
 namespace sensors{
-  float air_quality(int pin=AIR_QUAL_PIN, unsigned long sampletime_ms=10000){
-  //https://www.howmuchsnow.com/arduino/airquality/grovedust/
-  unsigned long duration;
-  unsigned long starttime;
-  unsigned long lowpulseoccupancy = 0;
-  float ratio = 0;
-  float concentration = 0;
-  Timer t = Timer(sampletime_ms);
-  while(!t.hasElapsed()){
-    duration = pulseIn(pin, LOW);
-    lowpulseoccupancy += duration;
-  }
-  ratio = lowpulseoccupancy/(sampletime_ms*10.0);
-  concentration = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62;
-  if (concentration <= 0.62){
-    return 0;
-  }
-  concentration *= 100; // Convert pcs/0.01cf => pcs/cf
-  concentration /= 0.0283168466; // Convert pcs/cf => pcs/m^3
-  concentration /= 1000; // Convert pcs/m^3 => pcs/L
-  return concentration;
-  }
+  float atm_air_quality(int pin=AIR_QUAL_PIN, unsigned long sampletime_ms=10000){
+    //https://www.howmuchsnow.com/arduino/airquality/grovedust/
+    unsigned long duration;
+    unsigned long starttime;
+    unsigned long lowpulseoccupancy = 0;
+    float ratio = 0;
+    float concentration = 0;
+    Timer t = Timer(sampletime_ms);
+    while(!t.hasElapsed()){
+      duration = pulseIn(pin, LOW);
+      lowpulseoccupancy += duration;
+    }
+    ratio = lowpulseoccupancy/(sampletime_ms*10.0);
+    concentration = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62;
+    if (concentration <= 0.62){
+      return 0;
+    }
+    concentration *= 100; // Convert pcs/0.01cf => pcs/cf
+    concentration /= 0.0283168466; // Convert pcs/cf => pcs/m^3
+    concentration /= 1000; // Convert pcs/m^3 => pcs/L
+    return concentration;
+    }
+  float UV_intensity(int pin){
+    /*TODO: implement */
+    }
+  float light_intensity(int pin){
+    /*TODO: implement */
+    }
+  float atm_CO2_ammount(int pin){
+    /*TODO: implement */
+    }
+  float atm_air_pressure(int pin){
+    /*TODO: implement */
+    }
+  float atm_smoke_ammount(int pin){
+    /*TODO: implement */
+    }
+  float atm_sound_pressure(int pin){
+    /*TODO: implement */
+    }
 };
 
 namespace operation {
@@ -230,16 +261,77 @@ namespace operation {
     }
 }
 
+namespace buzzer {
+  const int BUZZ_PIN = BUZZER_PIN;
+  const unsigned int plank_buzz = 10;
+  const unsigned int short_buzz = 100;
+  const unsigned int med_buzz = 400;
+  const unsigned int long_buzz = 800;
+  namespace note {
+      const float C4 = 261.63;
+      const float D4 = 293.66;
+      const float E4 = 329.63;
+      const float F4 = 349.23;
+      const float G4 = 392.00;
+      const float A4 = 440.00;
+      const float B4 = 493.88;
+  }
+    
+  
+  void pulse_buzzer(int numPulses, unsigned int delay_ms, unsigned int freq) {
+    // Loop through the number of pulses
+    for (int i = 0; i < numPulses; i++) {
+      // Output the pulse tone on the buzzer pin
+      tone(BUZZ_PIN, freq);
+      delay(delay_ms);
+      // Turn off the buzzer
+      noTone(BUZZ_PIN);
+      delay(delay_ms);
+    }
+  }
+  void buzz(unsigned int time, unsigned int freq){
+    tone(BUZZ_PIN, freq);
+    delay(time);
+    noTone(BUZZ_PIN);
+  }
+  void system_on(){
+    buzz(short_buzz, note::C4);
+    delay(short_buzz);
+    buzz(short_buzz, note::E4);
+    delay(short_buzz);
+    buzz(short_buzz, note::C4*2);
+  }
+  void cycle_start(){
+    buzz(plank_buzz, note::A4);
+  }
+  // void cycle_end(){}
+  void error(){
+    buzz(long_buzz, note::C4/(2^2));
+  }
+  void success(){
+    pulse_buzzer(2, short_buzz, note::A4);
+  }
+  void warning(){
+    pulse_buzzer(2, med_buzz, note::C4/2);
+  }
+  void saving_data(){
+    buzz(short_buzz, note::E4);    
+  }
+}
+
 // GLOBAL VARIABLES
+volatile bool NOTIFICATIONS = true;
+const bool SD_CARD_LOG = false;
+
 // SCREENS:
 LiquidCrystal_I2C lcd1(0x27, 16, 2);
 lcd_config lcd1_conf = {lcd1, 16, 2};
 // SENSORS
 DHT dht_sensor = DHT(DHT_PIN, DHT_TYPE);
-// BUFFERS
 
 void setup()
 {
+    buzzer::system_on();
     long int start = millis();
     util::init_serial(9600);
     // Find screens
@@ -260,12 +352,23 @@ void setup()
     pinMode(USER_INPUT_PIN_1, INPUT);
 
     // Initialize result storage.
-
+    if (SD_CARD_LOG){
+      if (!SD.begin(SD_CS_PIN)){
+        Serial.println("Failed to initialize SD card storage.");
+        return;
+      }
+      else{
+        Serial.println("SD card storage initialized successfully!");
+      }
+    }
     // Tests
     Serial.println("Running tests.");
     LinkedList<BoolFunc> tests = LinkedList<BoolFunc>();
     tests.add(testQueue);
     tests.add(testLinkedList);
+    // tests.add(test_entry_struct);
+    // tests.add(test_entry_struct_values);
+    // tests.add(test_entry_struct_addition);
     util::run_tests(lcd1_conf,tests);
 
     // Setup total time.
@@ -283,15 +386,17 @@ void setup()
       sprintf(TEXT_BUFFER, MSG_EN_INSTRUCTIONS);
       while (!timer.hasElapsed()){ util::display_whole_text_LCD(lcd1_conf, TEXT_BUFFER); continue;}
     }
+    buzzer::success();
     delay(1500);
 }
 
 int n = 0;
 void loop()
 {
+    buzzer::cycle_start();
     // put your main code here, to run repeatedly:
     long int start = millis();
-    char TEXT_BUFFER[80];
+    char TEXT_BUFFER[40];
 
     sprintf(TEXT_BUFFER, "Selecting mode\nOBS: B1 BEN: B2");
     util::printLcd(lcd1_conf, TEXT_BUFFER);
@@ -313,17 +418,35 @@ void loop()
 
       sprintf(TEXT_BUFFER, "Measuring air quality...");
       util::printLcd(lcd1_conf, TEXT_BUFFER);
-      float particle_concentration = sensors::air_quality(AIR_QUAL_PIN, 10000);
+      float particle_concentration = sensors::atm_air_quality(AIR_QUAL_PIN, 10000);
       char tmp_particle[10];
       sprintf(TEXT_BUFFER, "Conc: %s pcs/L", util::f2str(particle_concentration, tmp_particle));
       util::display_whole_text_LCD(lcd1_conf, TEXT_BUFFER);
+      delay(2000);
+      // Write data to SD card.
+      if (SD_CARD_LOG){
+        
+        sprintf(TEXT_BUFFER, "Writing data to SD card.");
+        util::display_whole_text_LCD(lcd1_conf, TEXT_BUFFER);
+        measurement::entry data_entry = measurement::entry{};
+        data_entry.atm_temperature = temperature;
+        data_entry.atm_humidity = humidity;
+        data_entry.atm_air_particle = particle_concentration;
+        File log = SD.open("data_meteo.bin", FILE_WRITE);
+        if (log){
+          //File successfully opened.
+          util::write_measurement_to_file(log, data_entry);
+        }
+        log.close();
+      }
+
     }
     else if (mode == operation::BENCH) {
       sprintf(TEXT_BUFFER, "Benchmark mode selected.");
       delay(2000);
       util::display_whole_text_LCD(lcd1_conf, TEXT_BUFFER);
     }
-    delay(4000);
+    delay(1000);
     // Benchmark stats.
     n++;
     long int total = util::benchmark(start);
