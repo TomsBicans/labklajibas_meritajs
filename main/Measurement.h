@@ -1,5 +1,5 @@
 namespace measurement {
-  const float NOVAL = -100;
+  const float NOVAL = 0;
     enum LIKES {
     NO,
     YES,
