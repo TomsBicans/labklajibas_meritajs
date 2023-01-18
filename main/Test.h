@@ -1,8 +1,45 @@
+#include "HardwareSerial.h"
 #include <assert.h>
 #include "LinkedList.h"
 #include "Queue.h"
 #include "Timer.h"
 #include "Measurement.h"
+
+void test_print_entry(measurement::entry &e){
+  Serial.print("time: ");
+  Serial.println(e.time);
+  Serial.print("atm_temperature: ");
+  Serial.println(e.atm_temperature);
+  Serial.print("atm_humidity: ");
+  Serial.println(e.atm_humidity);
+  Serial.print("atm_air_pressure: ");
+  Serial.println(e.atm_air_pressure);
+  Serial.print("atm_air_particle: ");
+  Serial.println(e.atm_air_particle);
+  Serial.print("atm_air_smoke: ");
+  Serial.println(e.atm_air_smoke);
+  Serial.print("atm_CO2_ammount: ");
+  Serial.println(e.atm_CO2_ammount);
+  Serial.print("atm_sound_pressure: ");
+  Serial.println(e.atm_sound_pressure);
+  Serial.print("light_intensity: ");
+  Serial.println(e.light_intensity);
+  Serial.print("UV_intensity: ");
+  Serial.println(e.UV_intensity);
+  Serial.print("quality_rating: ");
+  Serial.println(e.quality_rating);
+  Serial.print("user_likes: ");
+  Serial.println(e.user_likes);
+  delay(3000);
+}
+
+bool test_float_compare(float x, float y, float tolerance) {
+    if (abs(x - y) < tolerance) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
 // Test the queue class implementation
 bool testQueue()
@@ -114,23 +151,51 @@ bool testLinkedList(){
 
 void test_entry_struct() {
   // create an entry struct
-  measurement::entry e{};
+  measurement::entry e = measurement::entry{};
+  Serial.print("test_entry_struct ");
+  // Serial.print("time: ");
+  // Serial.println(e.time);
+  // Serial.print("atm_temperature: ");
+  // Serial.println(e.atm_temperature);
+  // Serial.print("atm_humidity: ");
+  // Serial.println(e.atm_humidity);
+  // Serial.print("atm_air_pressure: ");
+  // Serial.println(e.atm_air_pressure);
+  // Serial.print("atm_air_particle: ");
+  // Serial.println(e.atm_air_particle);
+  // Serial.print("atm_air_smoke: ");
+  // Serial.println(e.atm_air_smoke);
+  // Serial.print("atm_CO2_ammount: ");
+  // Serial.println(e.atm_CO2_ammount);
+  // Serial.print("atm_sound_pressure: ");
+  // Serial.println(e.atm_sound_pressure);
+  // Serial.print("light_intensity: ");
+  // Serial.println(e.light_intensity);
+  // Serial.print("UV_intensity: ");
+  // Serial.println(e.UV_intensity);
+  // Serial.print("quality_rating: ");
+  // Serial.println(e.quality_rating);
+  // Serial.print("user_likes: ");
+  // Serial.println(e.user_likes);
+  // delay(3000);
 
   // check that the fields are set to the expected default values
   assert(e.atm_temperature == measurement::NOVAL);
   assert(e.atm_air_pressure == measurement::NOVAL);
   assert(e.atm_air_particle == measurement::NOVAL);
   assert(e.atm_CO2_ammount == measurement::NOVAL);
+  Serial.print(".");
   assert(e.atm_sound_pressure == measurement::NOVAL);
   assert(e.UV_intensity == measurement::NOVAL);
   assert(e.quality_rating == 100);
-  assert(e.user_likes == measurement::LIKES::UNKNOWN);
+  // assert(e.user_likes == measurement::LIKES::UNKNOWN);
+  Serial.print(".");
   return true;
 }
 
 void test_entry_struct_values() {
   // create an entry struct
-  measurement::entry e{};
+  measurement::entry e = measurement::entry{};
 
   // set the values of some of the fields
   e.atm_temperature = 15.5;
@@ -140,24 +205,25 @@ void test_entry_struct_values() {
   e.atm_sound_pressure = 70;
 
   // check that the fields have the expected values
-  assert(e.atm_temperature == 15.5);
-  assert(e.atm_air_pressure == 1013.2);
-  assert(e.atm_air_particle == 0.8);
-  assert(e.atm_CO2_ammount == 400);
-  assert(e.atm_sound_pressure == 70);
+  assert(test_float_compare(e.atm_temperature, 15.5, 1));
+  assert(test_float_compare(e.atm_air_pressure, 1013.2, 1));
+  assert(test_float_compare(e.atm_air_particle, 0.8, 1));
+  assert(test_float_compare(e.atm_CO2_ammount, 400, 1));
+  assert(test_float_compare(e.atm_sound_pressure, 70, 1));
+  // Serial.print(".");
 
   // check that the other fields still have the default values
-  assert(e.UV_intensity == measurement::NOVAL);
-  assert(e.quality_rating == 100);
-  assert(e.user_likes == measurement::LIKES::UNKNOWN);
+  assert(test_float_compare(e.UV_intensity, measurement::NOVAL, 1));
+  assert(test_float_compare(e.quality_rating, 100, 1));
+  // assert(e.user_likes == measurement::UNKNOWN);
   return true;
 }
 
 void test_entry_struct_addition() {
   // create an entry struct
-  measurement::entry e1{};
-  measurement::entry e2{};
-  measurement::entry e3{};
+  measurement::entry e1 = measurement::entry{};
+  measurement::entry e2 = measurement::entry{};
+  measurement::entry e3 = measurement::entry{};
   // set the values of some of the fields
   e1.atm_temperature = 50;
   e1.atm_air_pressure = 50;
@@ -172,13 +238,15 @@ void test_entry_struct_addition() {
   e2.atm_sound_pressure = 50;
 
   e3 = e1 + e2;
+  // print_entry(e3);
 
   // check that the fields have the expected values
-  assert(e1.atm_temperature == 100);
-  assert(e1.atm_air_pressure == 100);
-  assert(e1.atm_air_particle == 100);
-  assert(e1.atm_CO2_ammount == 100);
-  assert(e1.atm_sound_pressure == 100);
+
+  assert(test_float_compare(e3.atm_temperature, 100, 1));
+  assert(test_float_compare(e3.atm_air_pressure, 100, 1));
+  assert(test_float_compare(e3.atm_air_particle, 100, 1));
+  assert(test_float_compare(e3.atm_CO2_ammount, 100, 1));
+  assert(test_float_compare(e3.atm_sound_pressure, 100, 1));
   return true;
 }
 

@@ -6,7 +6,7 @@ namespace measurement {
     UNKNOWN
   };
   struct entry {
-    float time = 0;
+    unsigned long time = 0;
     float atm_temperature = NOVAL;
     float atm_humidity = NOVAL;
     float atm_air_pressure = NOVAL;
@@ -21,6 +21,7 @@ namespace measurement {
   };
   entry operator+(const entry& e1, const entry& e2){
     entry result;
+    result.time = e1.time;
     result.atm_temperature = e1.atm_temperature + e2.atm_temperature;
     result.atm_humidity = e1.atm_humidity + e2.atm_humidity;
     result.atm_air_pressure = e1.atm_air_pressure + e2.atm_air_pressure;
@@ -35,6 +36,7 @@ namespace measurement {
   }
   entry operator/(const entry& e, const int num){
     entry result;
+    result.time = e.time;
     result.atm_temperature = e.atm_temperature / num;
     result.atm_humidity = e.atm_humidity / num;
     result.atm_air_pressure = e.atm_air_pressure / num;
@@ -47,4 +49,57 @@ namespace measurement {
     result.quality_rating = e.quality_rating / num;
     return result; 
   }
+  void print_entry_binary(entry e) {
+    Serial.write((byte*)&e, sizeof(e));
+  }
+  void print_entry(entry e) {
+    Serial.print(e.time);
+    Serial.print(",");
+    Serial.print(e.atm_temperature);
+    Serial.print(",");
+    Serial.print(e.atm_humidity);
+    Serial.print(",");
+    Serial.print(e.atm_air_pressure);
+    Serial.print(",");
+    Serial.print(e.atm_air_particle);
+    Serial.print(",");
+    Serial.print(e.atm_air_smoke);
+    Serial.print(",");
+    Serial.print(e.atm_CO2_ammount);
+    Serial.print(",");
+    Serial.print(e.atm_sound_pressure);
+    Serial.print(",");
+    Serial.print(e.light_intensity);
+    Serial.print(",");
+    Serial.print(e.UV_intensity);
+    Serial.print(",");
+    Serial.print(e.quality_rating);
+    Serial.print(",");
+    Serial.println(e.user_likes);
+  }
+
+  void print_headers() {
+    Serial.print("time");
+    Serial.print(",");
+    Serial.print("atm_temperature");
+    Serial.print(",");
+    Serial.print("atm_humidity");
+    Serial.print(",");
+    Serial.print("atm_air_pressure");
+    Serial.print(",");
+    Serial.print("atm_air_particle");
+    Serial.print(",");
+    Serial.print("atm_air_smoke");
+    Serial.print(",");
+    Serial.print("atm_CO2_ammount");
+    Serial.print(",");
+    Serial.print("atm_sound_pressure");
+    Serial.print(",");
+    Serial.print("light_intensity");
+    Serial.print(",");
+    Serial.print("UV_intensity");
+    Serial.print(",");
+    Serial.println("quality_rating,user_likes");
+  }
+
 };

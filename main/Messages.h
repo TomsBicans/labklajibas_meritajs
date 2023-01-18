@@ -1,5 +1,3 @@
-// File: MyCharArrays.h
-
 #ifndef MY_MESSAGES_H
 #define MY_MESSAGES_H
 
