@@ -3,6 +3,9 @@ import os
 import serial
 import threading
 import time
+import os.path as path
+
+LOG_FILE = path.join(path.dirname(__file__), "running_logs.log")
 
 
 def monitor(comport: str, baudrate: int):
@@ -24,7 +27,7 @@ def monitor(comport: str, baudrate: int):
             # print fields
             # print("device ID: ", ID)
             # write to file
-            text_file = open("Pdata.log", "a")
+            text_file = open(LOG_FILE, "a")
             # line = str(TIME) + ": " + str(CT) + "\n"
             text_file.write(line)
             text_file.close()

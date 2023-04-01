@@ -554,7 +554,8 @@ void setup()
       while (!timer.hasElapsed()){ util::display_whole_text_LCD(lcd1_conf, TEXT_BUFFER); continue;}
     }
     buzzer::success();
-    delay(1500);
+    delay(1000);
+    measurement::print_headers();    
 }
 
 int LOOP_COUNT = 0;
