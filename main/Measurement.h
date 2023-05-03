@@ -1,3 +1,6 @@
+#ifndef MEASUREMENT_H
+#define MEASUREMENT_H
+
 namespace measurement {
   const float NOVAL = 0;
     enum LIKES {
@@ -103,3 +106,5 @@ namespace measurement {
   }
 
 };
+
+#endif // MEASUREMENT_H

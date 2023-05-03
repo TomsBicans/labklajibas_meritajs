@@ -1,16 +1,21 @@
 // LCD DISPLEJS
 #include <stdio.h>
 #include <Wire.h>
-#include <LiquidCrystal_I2C.h>
 #include <DHT.h>
 #include <Adafruit_BMP085.h>
 #include <SPI.h>
 #include <SD.h>
-#include "LCD_config.h"
 #include "Messages.h"
-#include "Test.h"
 #include "DS3231.h"
+#include "HT_SSD1306Wire.h"
+#include "HT_DisplayUi.h"
 
+// TESTS and modules
+#include <ArduinoUnit.h>
+#include "TestMeasurement.h"
+#include "TestTimer.h"
+#include "TestQueue.h"
+#include "TestLinkedList.h"
 
 // Defines
 #define USER_INPUT_PIN_1 3
@@ -28,6 +33,13 @@
 //Typedefs
 typedef bool (*BoolFunc)();
 
+// GLOBAL VARIABLES
+const bool SD_CARD_LOG = true;
+SSD1306Wire  factory_display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED); // addr , freq , i2c group , resolution , rst
+
+// SENSORS
+DHT dht_sensor = DHT(DHT_PIN, DHT_TYPE);
+Adafruit_BMP085 bmp;
 
 namespace util{
     static void init_serial(unsigned int baud_rate=9600)
@@ -42,92 +54,13 @@ namespace util{
     {
         return max(lower, min(n, upper));
     }
-    char *char_arr(int size)
-    {
-        size = clamp(size, 0, abs(size));
-        char *t = new char[size + 1];
-        for (int i=0; i<size; i++){
-          t[i] = "\0";
-        }
-        t[size] = "\0";
-        return t;
-    }
     unsigned long benchmark(unsigned long t1){
       unsigned long t2 = millis();
       return t2 - t1;
     }
 
-    void benchmark(long int t1, long int t2){
+    long int benchmark(long int t1, long int t2){
       return t2 - t1;
-    }
-    LinkedList<int> find_I2C_devices(bool suppress_msg=true){
-        // Atgriež sarakstu ar adresēm, kurās atrodas I2C iekārtas.
-        byte error, address;
-        int device_count;
-        int res = 0;
-        LinkedList<int> devices;
-        if (!suppress_msg) Serial.println("Scanning...");
-
-        device_count = 0;
-        for (address = 1; address < 127; address++ ) {
-          Wire.begin();
-          Wire.beginTransmission(address);
-          error = Wire.endTransmission();
-          if (error == 0) {
-            if (!suppress_msg) Serial.print("I2C device found at address 0x");
-            if (address < 16)
-              if (!suppress_msg) Serial.print("0");
-            if (!suppress_msg) Serial.print(address, HEX);
-            devices.add(address);
-            if (!suppress_msg) Serial.println("  !");
-            res++;
-            device_count++;
-          }
-          else if (error == 4) {
-            if (!suppress_msg) Serial.print("Unknown error at address 0x");
-            if (address < 16)
-              if (!suppress_msg) Serial.print("0");
-            if (!suppress_msg) Serial.println(address, HEX);
-          }
-        }
-        if (res == 0){
-          if (!suppress_msg) Serial.println("No I2C devices found\n");
-          return devices;
-        }
-        else{
-          if (!suppress_msg) Serial.println("done\n");
-          return devices;
-        }}
-    int printLcd(lcd_config config, char text[]) {
-      // Return the number of symbols written on the screen.
-      config.lcd.clear();
-      int numCols = config.columns; // Assume a 16-column LCD screen
-      int numRows = config.rows; // Assume a 2-row LCD screen
-      int textLen = strlen(text); // Get the length of the text array
-      int col = 0, row = 0; // Start at the first column and first row
-      int written = 0;
-      for (int i = 0; i < textLen; i++) {
-        written++;
-        if (text[i] == '\n') { // If a newline character is found
-          col = 0; // Reset the column to 0
-          row++; // Increment the row
-          if (row >= numRows) { // If the row is outside the bounds of the screen
-            break; // Stop printing
-          }
-        } else {
-          config.lcd.setCursor(col, row); // Set the cursor position
-          config.lcd.print(text[i]); // Print the character
-          col++; // Increment the column
-          if (col >= numCols) { // If the column is outside the bounds of the screen
-            col = 0; // Reset the column to 0
-            row++; // Increment the row
-            if (row >= numRows) { // If the row is outside the bounds of the screen
-              break; // Stop printing
-            }
-          }
-        }
-      }
-      return written;
     }
     char* f2str(float value, char *result) {
       // Convert the floating-point number to a string with two decimal places
@@ -136,77 +69,6 @@ namespace util{
       return result;
     }
 
-    int countWords(char *str) {
-      // Function that counts the number of words in a char array
-      int count = 0;  // Word count
-
-      // Use strtok() to split the char array into individual words
-      char *token = strtok(str, " ");
-      while (token != NULL) {
-        // Increment the word count
-        count++;
-
-        // Get the next word in the char array
-        token = strtok(NULL, " ");
-      }
-
-      // Return the word count
-      return count;
-    }
-    void display_whole_text_LCD(lcd_config config, char text[]){
-      // Display the whole text in LCD screen, even if the whole text does not fit on the screen at once.
-      int total_length = strlen(text);
-      int printed_c = util::printLcd(config, text);
-      while (printed_c < total_length){
-        // Serial.println(printed_c);
-        delay(1700);
-        printed_c += util::printLcd(config, text+printed_c);
-      }
-      delay(2000);
-    }
-
-    void display_measurements_LCD(lcd_config config, measurement::entry e){
-      char BUF[160];
-      char tmp_temp[10];
-      char tmp_hum[10];
-      char tmp_air_pres[10];
-      char tmp_air_particle[10];
-      char tmp_air_smoke[10];
-      char tmp_CO2[10];
-      char tmp_sound_pressure[10];
-      char tmp_light_intensity[10];
-      char tmp_UV_intensity[10];
-      sprintf(BUF, "Temp: %s *C\nHum: %s %%\nPress: %s kPa\nDust: %s pcs/L\nSmoke: %s ppm\nCO2: %s ppm\nNoise: %s dB\nLight: %s lux\nUV: %s", 
-                util::f2str(e.atm_temperature, tmp_temp),
-                util::f2str(e.atm_humidity, tmp_hum),
-                util::f2str(e.atm_air_pressure, tmp_air_pres),
-                util::f2str(e.atm_air_particle, tmp_air_particle),
-                util::f2str(e.atm_air_smoke, tmp_air_smoke),
-                util::f2str(e.atm_CO2_ammount, tmp_CO2),
-                util::f2str(e.atm_sound_pressure, tmp_sound_pressure),
-                util::f2str(e.light_intensity, tmp_light_intensity),
-                util::f2str(e.UV_intensity, tmp_UV_intensity)
-                // util::f2str(e.quality_rating, tmp_hum),
-                );
-      util::display_whole_text_LCD(config, BUF);
-      util::printLcd(config, BUF);
-    }
-
-    void run_tests(lcd_config config, LinkedList<BoolFunc>& tests){
-      int size = tests.getSize();
-      int passed = 0;
-      char buffer[40];
-      for (LinkedList<BoolFunc>::Node* node = tests.getHead(); node != nullptr; node = node->next) {
-        bool result = node->data();
-        if (result){
-            passed++;
-            sprintf(buffer, "Tests passed:\n%d/%d", passed, size);
-            util::printLcd(config, buffer);
-            Serial.println("Test passed.");
-        }
-
-      }      
-    }
     bool float_compare(float x, float y, float tolerance) {
       if (abs(x - y) < tolerance) {
         return true;
@@ -220,10 +82,9 @@ namespace util{
 
     void read_struct_from_file(File file, measurement::entry &data) {
       file.read((byte*)&data, sizeof(data));
-      // file.read((char*)&data, sizeof(data));
     }
 
-    void read_avg_struct_from_file(File file, measurement::entry &data){
+    measurement::entry read_avg_struct_from_file(File file, measurement::entry &data){
       int count = 0;
       measurement::entry res = measurement::entry{};
       while(file.available()){
@@ -235,8 +96,22 @@ namespace util{
       res = res / count;
       return res;
     }
+
 };
 
+namespace oled_screen{
+  void displayLoopInfo(SSD1306Wire &display, int loopCount, unsigned long globalTime, unsigned long lastLoopTime) {
+    display.clear();
+    display.setFont(ArialMT_Plain_10);
+
+    display.drawString(0, 0, "Loop Info:");
+    display.drawString(0, 12, "Loop Count: " + String(loopCount));
+    display.drawString(0, 24, "Global Time: " + String(globalTime) + " ms");
+    display.drawString(0, 36, "Last Loop Time: " + String(lastLoopTime) + " ms");
+
+    display.display();
+  }
+}
 
 namespace print{
     void total_time(long int dif){
@@ -323,77 +198,11 @@ namespace sensors{
     }
 };
 
-namespace rating{
-    enum QUALITY {
-      VL = 75,
-      L = 80,
-      M = 90,
-      H = 100,
-    };
-    
-  QUALITY temperature(float value){
-    return H/100;
-  }
-  QUALITY humidity(float value){
-    return H/100;
-  }  
-  QUALITY atm_air_quality(float value){
-    return H/100;
-  }
-  QUALITY UV_intensity(float value){
-    /*TODO: implement */
-    return H/100;
-    }
-  QUALITY light_intensity(float value){
-    /*TODO: implement */
-    return H/100;
-    }
-  QUALITY atm_CO2_ammount(float value){
-    /*TODO: implement */
-    return H/100;
-    }
-  QUALITY atm_air_pressure(float value){
-    /*TODO: implement */
-    return H/100;
-    }
-  QUALITY atm_smoke_ammount(float value){
-    /*TODO: implement */
-    return H/100;
-    }
-  QUALITY atm_sound_pressure(float value){
-    /*TODO: implement */
-    return H/100;
-    }
-};
-
 namespace operation {
-    enum MODE {
-      OBS,
-      BENCH
-    };
     enum BUTTON {
       BTN1,
       BTN2
     };
-    MODE select_mode(unsigned long time_limit=10*1000, MODE default_mode=OBS){
-      MODE mode = default_mode;
-      Timer t = Timer(time_limit);
-      return OBS;
-      while(!t.hasElapsed()){
-          int tmp_mode = digitalRead(USER_INPUT_PIN_1);
-          if (tmp_mode == HIGH){
-            mode = OBS;
-            break;
-          }
-          tmp_mode = digitalRead(USER_INPUT_PIN_2);
-          if (tmp_mode == HIGH){
-            mode = BENCH;
-            break;
-          }
-          delay(20);
-      }
-      return mode;
-    }
     BUTTON button_press(unsigned long time_limit=10*1000, BUTTON default_mode=BTN1){
       BUTTON btn = default_mode;
       Timer t = Timer(time_limit);
@@ -472,40 +281,15 @@ namespace buzzer {
   }
 }
 
-// GLOBAL VARIABLES
-volatile bool NOTIFICATIONS = true;
-const bool SD_CARD_LOG = true;
-
-// SCREENS:
-LiquidCrystal_I2C lcd1(0x27, 16, 2);
-lcd_config lcd1_conf = {lcd1, 16, 2};
-
-LiquidCrystal_I2C lcd2(0x25, 20, 4);
-lcd_config lcd2_conf = {lcd2, 20, 4};
-
-// LiquidCrystal_I2C lcd3(0x26, 20, 4);
-// lcd_config lcd3_conf = {lcd3, 20, 4};
-// SENSORS
-DHT dht_sensor = DHT(DHT_PIN, DHT_TYPE);
-Adafruit_BMP085 bmp;
-
 void setup()
 {
     buzzer::system_on();
     long int start = millis();
+    // Initialize system
     util::init_serial(9600);
-    // Find screens
-    int count = 0;
-    while ((count = util::find_I2C_devices(false).getSize()) < 1){
-      Serial.print("Screens found: "); Serial.println(count); delay(2000);
-    }
-    // Serial.print("SCREEN COUNT: "); Serial.println(count);
-    // Initialize screens.
-    Serial.println("Initializing screens.");
-    lcd1.init(); 
-    lcd1.backlight();
-    lcd2.init();
-    lcd2.backlight();
+    factory_display.init();
+    // factory_display.flipScreenVertically();
+
     // Initialize sensors.
     Serial.println("Initializing sensors.");
     dht_sensor.begin();
@@ -521,235 +305,68 @@ void setup()
     if (SD_CARD_LOG){
       if (!SD.begin(SD_CS_PIN)){
         Serial.println("Failed to initialize SD card storage.");
-        while(1);
       }
       else{
         Serial.println("SD card storage initialized successfully!");
       }
     }
-    // Tests
-    Serial.println("Running tests.");
-    LinkedList<BoolFunc> tests = LinkedList<BoolFunc>();
-    tests.add(testQueue);
-    tests.add(testLinkedList);
-    tests.add(test_entry_struct);
-    tests.add(test_entry_struct_values);
-    tests.add(test_entry_struct_addition);
-    util::run_tests(lcd1_conf,tests);
-    tests.clear();
 
     // Setup total time.
     long int total = util::benchmark(start);
     print::total_time(total);
-    Serial.println("Setup done.");
-    // User interaction.
-    bool skipintro = true;
-    if (!skipintro){
-      char TEXT_BUFFER[100];
-      Timer timer = Timer(10*1000);
-      sprintf(TEXT_BUFFER, MSG_EN_GREET);
-      while (!timer.hasElapsed()){ util::display_whole_text_LCD(lcd1_conf, TEXT_BUFFER); continue;}
-      timer.reset(10*1000);
-      sprintf(TEXT_BUFFER, MSG_EN_INSTRUCTIONS);
-      while (!timer.hasElapsed()){ util::display_whole_text_LCD(lcd1_conf, TEXT_BUFFER); continue;}
-    }
     buzzer::success();
-    delay(1000);
-    measurement::print_headers();    
 }
 
 int LOOP_COUNT = 0;
 unsigned long GLOBAL_TIME = 0;
 void loop()
 {
+    Test::run();
     buzzer::cycle_start();
     // put your main code here, to run repeatedly:
     long int start = millis();
-    char TEXT_BUFFER[40];
+    measurement::entry data_point = measurement::entry{};
+    // delay(800);
+    // data_point.atm_temperature = dht_sensor.readTemperature();
+    // delay(500);
+    // data_point.atm_humidity = dht_sensor.readHumidity();
+    // delay(500);
 
-    sprintf(TEXT_BUFFER, "Select mode\nOBS: B1 BEN: B2");
-    util::printLcd(lcd1_conf, TEXT_BUFFER);
-    // util::printLcd(lcd2_conf, "");
-    operation::MODE mode = operation::select_mode(10*1000, operation::OBS);
-    int measure_count = 1;
-    if (mode == operation::OBS){
-      measure_count = 1;
-      sprintf(TEXT_BUFFER, "Obs mode selected, cycle: %d", LOOP_COUNT);
-      Serial.println(TEXT_BUFFER);
-      util::printLcd(lcd1_conf, TEXT_BUFFER);
-      delay(2000);
-    }
-    else if (mode == operation::BENCH) {      
-      measure_count = 3;
-      sprintf(TEXT_BUFFER, "Benchmark mode selected.");
-      Serial.println(TEXT_BUFFER);
-      util::printLcd(lcd1_conf, TEXT_BUFFER);
-      delay(2000);
-    }
-    measurement::entry result = measurement::entry{};
-    // measurement::print_entry(result);
+    // // ATMOSPHERE AIR PRESSURE
+    // delay(800);
+    // data_point.atm_air_pressure = sensors::atm_air_pressure(bmp);
     
-    for (int i=0; i<measure_count; i++){
-        measurement::entry data_point = measurement::entry{};
-        // AIR TEMPERATURE AND HUMIDITY
-        sprintf(TEXT_BUFFER, "Measuring temperature and humidity.");
-        util::printLcd(lcd1_conf, TEXT_BUFFER);
-        delay(800);
-        data_point.atm_temperature = dht_sensor.readTemperature();delay(500);
-        data_point.atm_humidity = dht_sensor.readHumidity();delay(500);
-        char tmp_temp[10];
-        char tmp_hum[10];
-        sprintf(TEXT_BUFFER, "Temp: %s (*C)\nHum: %s (%%)", util::f2str(data_point.atm_temperature, tmp_temp), util::f2str(data_point.atm_humidity, tmp_hum));
-        util::display_whole_text_LCD(lcd1_conf, TEXT_BUFFER);
+    // // AIR PARTICLE COUNT
+    // delay(800);
+    // data_point.atm_air_particle = sensors::atm_air_quality(AIR_QUAL_PIN, 10000);
 
-        // ATMOSPHERE AIR PRESSURE
-        sprintf(TEXT_BUFFER, "Measuring air pressure..");
-        delay(800);
-        util::printLcd(lcd1_conf, TEXT_BUFFER);
-        data_point.atm_air_pressure = sensors::atm_air_pressure(bmp);
-        sprintf(TEXT_BUFFER, "Air pressure:\n%s kPa", util::f2str(data_point.atm_air_pressure, tmp_temp));
-        util::printLcd(lcd1_conf, TEXT_BUFFER);
-        
-        // AIR PARTICLE COUNT
-        sprintf(TEXT_BUFFER, "Measuring air quality...");
-        delay(800);
-        util::printLcd(lcd1_conf, TEXT_BUFFER);
-        data_point.atm_air_particle = sensors::atm_air_quality(AIR_QUAL_PIN, 10000);
-        sprintf(TEXT_BUFFER, "Conc: %s pcs/L", util::f2str(data_point.atm_air_particle, tmp_temp));
-        util::display_whole_text_LCD(lcd1_conf, TEXT_BUFFER);
+    // // UV RADIATION
+    // delay(800);
+    // data_point.UV_intensity = sensors::UV_intensity(10);
 
-        // UV RADIATION
-        sprintf(TEXT_BUFFER, "Measuring UV radiation...");
-        delay(800);
-        util::printLcd(lcd1_conf, TEXT_BUFFER);
-        data_point.UV_intensity = sensors::UV_intensity(10);
-        sprintf(TEXT_BUFFER, "UV radiation:\n%s ev", util::f2str(data_point.UV_intensity, tmp_temp));
-        util::printLcd(lcd1_conf, TEXT_BUFFER);
+    // // LIGHT INTENSITY
+    // delay(800);
+    // data_point.light_intensity = sensors::light_intensity(10);
 
-        // LIGHT INTENSITY
-        sprintf(TEXT_BUFFER, "Measuring light intensity...");
-        delay(800);
-        util::printLcd(lcd1_conf, TEXT_BUFFER);
-        data_point.light_intensity = sensors::light_intensity(10);
-        sprintf(TEXT_BUFFER, "Light: %s lux", util::f2str(data_point.light_intensity, tmp_temp));
-        util::printLcd(lcd1_conf, TEXT_BUFFER);
+    // // CO2 AMMOUNT
+    // delay(800);
+    // data_point.atm_CO2_ammount = sensors::atm_CO2_ammount(CO2_PWM_PIN);
 
-        // CO2 AMMOUNT
-        sprintf(TEXT_BUFFER, "Measuring CO2 ammount..");
-        delay(800);
-        util::printLcd(lcd1_conf, TEXT_BUFFER);
-        data_point.atm_CO2_ammount = sensors::atm_CO2_ammount(CO2_PWM_PIN);
-        sprintf(TEXT_BUFFER, "CO2: %s ppm", util::f2str(data_point.atm_CO2_ammount, tmp_temp));
-        util::printLcd(lcd1_conf, TEXT_BUFFER);
+    // // ATMOSPHERE SMOKE AMMOUNT
+    // delay(800);
+    // data_point.atm_air_smoke = sensors::atm_smoke_ammount(10);
 
-        // ATMOSPHERE SMOKE AMMOUNT
-        sprintf(TEXT_BUFFER, "Measuring smoke ammount..");
-        delay(800);
-        util::printLcd(lcd1_conf, TEXT_BUFFER);
-        data_point.atm_air_smoke = sensors::atm_smoke_ammount(10);
-        sprintf(TEXT_BUFFER, "Smoke:\n%s ppm", util::f2str(data_point.atm_air_smoke, tmp_temp));
-        util::printLcd(lcd1_conf, TEXT_BUFFER);
+    // // ATMOSPHERE SOUND PRESSURE
+    // delay(800);
+    // data_point.atm_sound_pressure = sensors::atm_sound_pressure(NOISE_SENSOR_A_PIN);
+    delay(800);
+    data_point.time = GLOBAL_TIME;
+    measurement::print_entry(data_point);
 
-        // ATMOSPHERE SOUND PRESSURE
-        sprintf(TEXT_BUFFER, "Measuring sound pressure..");
-        delay(800);
-        util::printLcd(lcd1_conf, TEXT_BUFFER);
-        data_point.atm_sound_pressure = sensors::atm_sound_pressure(NOISE_SENSOR_A_PIN);
-        sprintf(TEXT_BUFFER, "Sound pressure:\n%s dB", util::f2str(data_point.atm_sound_pressure, tmp_temp));
-        util::printLcd(lcd1_conf, TEXT_BUFFER);
-        result = result + data_point;
-        util::display_measurements_LCD(lcd2_conf, data_point);
-    }
-    result = result / measure_count;
-
-    if (mode == operation::BENCH){
-      float total_rating = 100;
-      total_rating *= rating::temperature(result.atm_temperature);
-      total_rating *= rating::humidity(result.atm_humidity);
-      total_rating *= rating::atm_air_quality(result.atm_air_particle);
-      total_rating *= rating::UV_intensity(result.UV_intensity);
-      total_rating *= rating::light_intensity(result.light_intensity);
-      total_rating *= rating::atm_CO2_ammount(result.atm_CO2_ammount);
-      total_rating *= rating::atm_air_pressure(result.atm_air_pressure);
-      total_rating *= rating::atm_smoke_ammount(result.atm_air_smoke);
-      total_rating *= rating::atm_sound_pressure(result.atm_sound_pressure);
-      char tmp_buff[10];
-      sprintf(TEXT_BUFFER, "Total rating:\n%s (0-100)", util::f2str(total_rating, tmp_buff));
-      util::printLcd(lcd1_conf, TEXT_BUFFER);
-      result.quality_rating = total_rating;
-      delay(2000);
-      // Do some more user interaction.
-      sprintf(TEXT_BUFFER, "Do you like the environment?");
-      util::printLcd(lcd1_conf, TEXT_BUFFER);
-      operation::BUTTON user_selection = operation::button_press(10*1000, operation::BUTTON::BTN1);
-      if (user_selection == operation::BTN1){
-        // The user likes.
-        result.user_likes = measurement::LIKES::YES;
-      }
-      if (user_selection == operation::BTN2){
-        // The user does not like.
-        result.user_likes = measurement::LIKES::NO;
-      }
-      // Do you want to know more?
-      sprintf(TEXT_BUFFER, "Do you want the details?");
-      util::printLcd(lcd1_conf, TEXT_BUFFER);
-      user_selection = operation::button_press(10*1000, operation::BUTTON::BTN2);
-      if (user_selection == operation::BTN1){
-        // The user wants to know more.
-        // Display each measurement description.
-      }
-      delay(2000);
-    };
-    result.time = GLOBAL_TIME;
-    measurement::print_entry(result);
-
-    // Write data to SD card.
-    if (SD_CARD_LOG && false){
-      sprintf(TEXT_BUFFER, "Writing data to SD card.");
-      util::display_whole_text_LCD(lcd1_conf, TEXT_BUFFER);
-      // Write to the end of the file.
-      if (mode == operation::OBS){
-        File data_file = SD.open("meteo.txt", FILE_WRITE);
-        if (data_file){
-          //File successfully opened.
-          Serial.println("Sucessful file open.");
-          util::write_measurement_to_file(data_file, result);
-          Serial.println("Succesfuly wrote data to file.");
-
-        }
-        else{
-          Serial.println("Unsuccessful file open.");
-        }
-        Serial.println("Closing file.");
-        // Šeit notiek programmatūras kļūda kaut kāda iemesla dēļ. 
-        // Programma vienkārši apstājās un nekad neturpina darbu pēc nākošajiem 2 priekšrakstiem
-        data_file.close();
-        data_file.flush();
-        Serial.println("File closed.");
-      }
-      else if (mode == operation::BENCH){
-        char f_name[20];       
-        if (result.user_likes == measurement::LIKES::YES){
-          sprintf(f_name, "likes.txt");
-        }
-        else if (result.user_likes == measurement::LIKES::NO){
-          sprintf(f_name, "dislikes.txt");
-        } else{
-          sprintf(f_name, "neutral.txt");
-        }
-        File log = SD.open(f_name, FILE_WRITE);
-        if (log){
-          util::write_measurement_to_file(log, result);
-        }
-        log.close();
-      }
-    }
-
-    delay(1000);
-    // Benchmark stats.
     LOOP_COUNT++;
     unsigned long total = util::benchmark(start);
-    GLOBAL_TIME += (unsigned long)abs(total);
+    GLOBAL_TIME += (unsigned long)abs((int)total);
     Serial.print(LOOP_COUNT); Serial.print(" ");
     print::total_time(total);
+    oled_screen::displayLoopInfo(factory_display, LOOP_COUNT, GLOBAL_TIME, total);
 }
