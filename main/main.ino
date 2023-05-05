@@ -9,8 +9,9 @@
 #include "DS3231.h"
 #include "HT_SSD1306Wire.h"
 #include "HT_DisplayUi.h"
+#include "WiFi.h"
 
-// TESTS and modules
+// TESTS and custom made modules
 #include <ArduinoUnit.h>
 #include "TestMeasurement.h"
 #include "TestTimer.h"
@@ -18,6 +19,7 @@
 #include "TestLinkedList.h"
 
 // Defines
+// for I2C sensors
 #define USER_INPUT_PIN_1 3
 #define USER_INPUT_PIN_2 5
 #define SD_CS_PIN 49
@@ -27,15 +29,19 @@
 #define AIR_QUAL_PIN 8
 #define BUZZER_PIN 9
 #define CO2_PWM_PIN 10
-
 #define NOISE_SENSOR_A_PIN 0
 
-//Typedefs
-typedef bool (*BoolFunc)();
+// SYSTEM TYPEs
+#define MONITORING_DEVICE 1
+#define ADMINISTRATOR_DEVICE 2
+
+// Selected system role.
+#define DEVICE_TYPE ADMINISTRATOR_DEVICE // Change this to ADMINISTRATOR_DEVICE for the administrator device
 
 // GLOBAL VARIABLES
 const bool SD_CARD_LOG = true;
 SSD1306Wire  factory_display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED); // addr , freq , i2c group , resolution , rst
+DisplayUi ui(&factory_display);
 
 // SENSORS
 DHT dht_sensor = DHT(DHT_PIN, DHT_TYPE);
@@ -50,6 +56,22 @@ namespace util{
         delay(300);
         Serial.println("Start");
     }
+    // static void init_lora(long frequency){
+    //   const int maxRetries = 10; // Set the maximum number of retries
+    //   int retryCount = 0;
+
+    //   while (!LoRa.begin(frequency)) {
+    //     retryCount++;
+    //     if (retryCount > maxRetries) {
+    //       Serial.println("Starting LoRa failed after multiple attempts!");
+    //       break; // Exit the loop if the maximum number of retries is reached
+    //     }
+    //     Serial.print("Attempt ");
+    //     Serial.print(retryCount);
+    //     Serial.println(": Starting LoRa failed, retrying...");
+    //     delay(1000); // Add a delay between each attempt
+    //   }
+    // }
     int clamp(int n, int lower, int upper)
     {
         return max(lower, min(n, upper));
@@ -111,6 +133,23 @@ namespace oled_screen{
 
     display.display();
   }
+
+  void display_device_information() {
+    factory_display.clear();
+    factory_display.setFont(ArialMT_Plain_10);
+    factory_display.drawString(0, 0, "LoRa Node");
+    
+    #if DEVICE_TYPE == MONITORING_DEVICE
+        factory_display.drawString(0, 12, "Role: Monitoring Device");
+        factory_display.drawString(0, 24, "Sensors: DHT, BMP, Noise, Air Quality");
+    #elif DEVICE_TYPE == ADMINISTRATOR_DEVICE
+        factory_display.drawString(0, 12, "Role: Administrator Device");
+        factory_display.drawString(0, 24, "Inputs: User Input 1, User Input 2");
+    #endif
+    
+    factory_display.display();
+}
+
 }
 
 namespace print{
@@ -283,48 +322,46 @@ namespace buzzer {
 
 void setup()
 {
-    buzzer::system_on();
     long int start = millis();
     // Initialize system
     util::init_serial(9600);
     factory_display.init();
-    // factory_display.flipScreenVertically();
+    factory_display.setFont(ArialMT_Plain_10);
+    WiFi.mode(WIFI_OFF);
+    factory_display.drawString(0, 0, "LoRa Node");
+    factory_display.display();
 
-    // Initialize sensors.
-    Serial.println("Initializing sensors.");
-    dht_sensor.begin();
-    if (!bmp.begin()) {
-	      Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-    }
-    pinMode(NOISE_PIN, INPUT);
-    pinMode(AIR_QUAL_PIN, INPUT);
-    pinMode(USER_INPUT_PIN_1, INPUT);
-    pinMode(USER_INPUT_PIN_2, INPUT);
+    // Device role
+    #if DEVICE_TYPE == MONITORING_DEVICE
+      // Initialize sensors.
+      Serial.println("Initializing sensors.");
+      dht_sensor.begin();
+      if (!bmp.begin()) {
+          Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+      }
+      pinMode(NOISE_PIN, INPUT);
+      pinMode(AIR_QUAL_PIN, INPUT);
 
-    // Initialize result storage.
-    if (SD_CARD_LOG){
-      if (!SD.begin(SD_CS_PIN)){
-        Serial.println("Failed to initialize SD card storage.");
-      }
-      else{
-        Serial.println("SD card storage initialized successfully!");
-      }
-    }
+    #elif DEVICE_TYPE == ADMINISTRATOR_DEVICE
+      pinMode(USER_INPUT_PIN_1, INPUT);
+      pinMode(USER_INPUT_PIN_2, INPUT);
+    #endif
+
+    oled_screen::display_device_information();
 
     // Setup total time.
     long int total = util::benchmark(start);
     print::total_time(total);
-    buzzer::success();
 }
 
 int LOOP_COUNT = 0;
 unsigned long GLOBAL_TIME = 0;
 void loop()
 {
-    Test::run();
-    buzzer::cycle_start();
-    // put your main code here, to run repeatedly:
-    long int start = millis();
+  Test::run();
+  buzzer::cycle_start();
+  long int start = millis();
+  #if DEVICE_TYPE == MONITORING_DEVICE
     measurement::entry data_point = measurement::entry{};
     // delay(800);
     // data_point.atm_temperature = dht_sensor.readTemperature();
@@ -359,14 +396,18 @@ void loop()
     // // ATMOSPHERE SOUND PRESSURE
     // delay(800);
     // data_point.atm_sound_pressure = sensors::atm_sound_pressure(NOISE_SENSOR_A_PIN);
-    delay(800);
     data_point.time = GLOBAL_TIME;
-    measurement::print_entry(data_point);
+    // measurement::print_entry(data_point);
+  #elif DEVICE_TYPE == ADMINISTRATOR_DEVICE
 
-    LOOP_COUNT++;
-    unsigned long total = util::benchmark(start);
-    GLOBAL_TIME += (unsigned long)abs((int)total);
-    Serial.print(LOOP_COUNT); Serial.print(" ");
-    print::total_time(total);
-    oled_screen::displayLoopInfo(factory_display, LOOP_COUNT, GLOBAL_TIME, total);
+  #endif
+
+  delay(2000);
+
+  LOOP_COUNT++;
+  unsigned long total = util::benchmark(start);
+  GLOBAL_TIME += (unsigned long)abs((int)total);
+  Serial.print(LOOP_COUNT); Serial.print(" ");
+  print::total_time(total);
+  // oled_screen::displayLoopInfo(factory_display, LOOP_COUNT, GLOBAL_TIME, total);
 }
