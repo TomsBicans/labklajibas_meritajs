@@ -1,3 +1,6 @@
+#ifndef TIMER_H
+#define TIMER_H
+
 class Timer {
   private:
     unsigned long startTime;  // Timer start time
@@ -5,28 +8,16 @@ class Timer {
 
   public:
     // Constructor, takes the timer interval as an argument
-    Timer(unsigned long interval) {
-      // Initialize the interval and start time
-      this->interval = interval;
-      startTime = millis();
-    }
+    Timer(unsigned long interval);
 
     // Check if the timer interval has elapsed
-    bool hasElapsed() {
-      return (millis() - startTime >= interval);
-    }
+    bool hasElapsed();
 
     // Set the timer interval
-    void setInterval(unsigned long newInterval) {
-      // Update the interval
-      interval = newInterval;
-    }
-    // Reset the timer with a new interval
-    void reset(unsigned long newInterval) {
-      // Update the interval
-      setInterval(newInterval);
+    void setInterval(unsigned long newInterval);
 
-      // Update the start time to the current time
-      startTime = millis();
-    }
+    // Reset the timer with a new interval
+    void reset(unsigned long newInterval);
 };
+
+#endif  // TIMER_H
