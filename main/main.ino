@@ -35,7 +35,7 @@
 #define ADMINISTRATOR_DEVICE 2
 
 // Selected system role.
-#define DEVICE_TYPE ADMINISTRATOR_DEVICE // Change this to ADMINISTRATOR_DEVICE for the administrator device
+#define DEVICE_TYPE MONITORING_DEVICE // Change this to ADMINISTRATOR_DEVICE for the administrator device
 
 BaseDevice *device = nullptr;
 
@@ -67,7 +67,7 @@ unsigned long loopCount = 0;
 unsigned long globalTime = 0;
 
 void loop() {
-  Test::run();
+  // Test::run();
   buzzer::cycle_start();
 
   unsigned long startTime = millis();
@@ -76,15 +76,14 @@ void loop() {
     device->loop();
   } else {
     Serial.println("Invalid device role!");
+    delay(2000);
   }
 
   loopCount++;
   unsigned long elapsedTime = util::benchmark(startTime);
   globalTime += elapsedTime;
 
-  Serial.print(loopCount);
-  Serial.print(" ");
-  print::total_time(elapsedTime);
-
-  delay(2000);
+  // Serial.print(loopCount);
+  // Serial.print(" ");
+  // print::total_time(elapsedTime);
 }

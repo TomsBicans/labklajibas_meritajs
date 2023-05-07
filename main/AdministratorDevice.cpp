@@ -1,13 +1,9 @@
 #include "AdministratorDevice.h"
 
-void AdministratorDevice::setup() {
-    // Call the base class setup function
-    BaseDevice::setup();
-
-    // Initialize inputs specific to administrator device
-    pinMode(USER_INPUT_PIN_1_CONST, INPUT);
-    pinMode(USER_INPUT_PIN_2_CONST, INPUT);
-    // Other administrator device-specific setup
+AdministratorDevice::AdministratorDevice() {
+    OnTxDoneFunc = &AdministratorDevice::OnTxDone;
+    OnTxTimeoutFunc = &AdministratorDevice::OnTxTimeout;
+    OnRxDoneFunc = &AdministratorDevice::OnRxDone;
 }
 
 void AdministratorDevice::display_device_information() {
@@ -19,9 +15,46 @@ void AdministratorDevice::display_device_information() {
     factory_display.display();
 }
 
+void AdministratorDevice::setup() {
+    // Call the base class setup function
+    BaseDevice::setup();
+    BaseDevice::setupLoRaWAN();
+    BaseDevice::configureRadioForRx();
+
+    // Initialize inputs specific to administrator device
+    pinMode(USER_INPUT_PIN_1_CONST, INPUT);
+    pinMode(USER_INPUT_PIN_2_CONST, INPUT);
+    // Other administrator device-specific setup
+}
+
 void AdministratorDevice::loop(){
-  Serial.println("Administrator device loop");
-  delay(1000);
+  if (loraIdle){
+    loraIdle = false;
+    Serial.println("into RX mode");
+    Radio.Rx(0);
+  }
+  Radio.IrqProcess();
+  // BaseDevice::loopLoRaWAN();
 }
 
 // Add other administrator device-specific functionality implementations as needed
+
+void AdministratorDevice::OnTxDone(void) {
+  Serial.println("TX done......");
+  loraIdle = true;
+}
+
+void AdministratorDevice::OnTxTimeout(void) {
+  Radio.Sleep();
+  Serial.println("TX Timeout......");
+  loraIdle = true;
+}
+
+void AdministratorDevice::OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
+{
+    memcpy(rxPacket, payload, size );
+    rxPacket[size]='\0';
+    Radio.Sleep( );
+    Serial.printf("\r\nreceived packet \"%s\" with rssi %d , length %d\r\n",rxPacket,rssi,size);
+    loraIdle = true;
+}

@@ -6,11 +6,17 @@
 #include "PinDefinitions.h"
 
 
+
 class AdministratorDevice : public BaseDevice {
 public:
+    AdministratorDevice();
     void setup() override;
     void display_device_information() override;
     void loop() override;
+
+    static void OnTxDone();
+    static void OnTxTimeout();
+    static void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr);
     // Add other administrator device-specific functionality as needed
 
 private:
