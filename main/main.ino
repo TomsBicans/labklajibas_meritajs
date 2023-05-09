@@ -1,39 +1,17 @@
 #include "LoRaWan_APP.h"
 #include "Arduino.h"
+#include "BaseDevice.h"
 #include "AdministratorDevice.h"
 #include "MonitoringDevice.h"
 
 // Constants definitions
-enum DeviceRole
-{
-    ADMINISTRATOR,
-    MONITORING_DEVICE
-};
-
-struct Device
-{
-    void (*setupFunc)();
-    void (*loopFunc)();
-    void (*OnTxDoneFunc)();
-    void (*OnTxTimeoutFunc)();
-    void (*OnRxDoneFunc)(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr);
-    void (*displayDeviceInfoFunc)();
-};
-
-void setupLoRaWAN(
-  void (*OnTxDoneFunc)(),
-  void (*OnTxTimeoutFunc)(),
-  void (*OnRxDoneFunc)(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
-);
-
 static RadioEvents_t RadioEvents;
 DeviceRole deviceRole = MONITORING_DEVICE; // Set the device role here
-Device device;
 
-// Other variables
-void assignRoleFunctions()
+Device assignRoleFunctions(DeviceRole role)
 {
-    if (deviceRole == ADMINISTRATOR)
+    Device device;
+    if (role == ADMINISTRATOR)
     {
         Serial.println("Administrator device selected.");
         device.setupFunc = setupAdministrator;
@@ -43,7 +21,7 @@ void assignRoleFunctions()
         device.OnTxTimeoutFunc = OnTxTimeoutAdministrator;
         device.OnRxDoneFunc = OnRxDoneAdministrator;
     }
-    else if (deviceRole == MONITORING_DEVICE)
+    else if (role == MONITORING_DEVICE)
     {
         Serial.println("Monitoring device selected.");
         device.setupFunc = setupMonitoringDevice;
@@ -53,20 +31,23 @@ void assignRoleFunctions()
         device.OnTxTimeoutFunc = OnTxTimeoutMonitoringDevice;
         device.OnRxDoneFunc = OnRxDoneMonitoringDevice;
     }
+    return device;
 }
 
+Device device = assignRoleFunctions(deviceRole);
 void setup()
 {
-    assignRoleFunctions();
     // Common setup
     setupBase();
     // Setup LoRaWAN
     setupLoRaWAN(
+      &RadioEvents,
       device.OnTxDoneFunc,
       device.OnTxTimeoutFunc,
-      device.OnRxDoneFunc);
+      device.OnRxDoneFunc
+    );
     // Setup for the role
-    // device.setupFunc();
+    device.setupFunc();
     device.displayDeviceInfoFunc();
 }
 
@@ -77,30 +58,4 @@ void loop()
         device.loopFunc();
     }
     Radio.IrqProcess();
-}
-
-void setupLoRaWAN(
-    void (*OnTxDoneFunc)(),
-    void (*OnTxTimeoutFunc)(),
-    void (*OnRxDoneFunc)(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
-) {
-    Serial.println("Initializing LORAWAN setup.");
-    Mcu.begin();
-
-    txNumber = 0;
-    loraIdle = true;
-
-    RadioEvents.TxDone = OnTxDoneFunc;
-    RadioEvents.TxTimeout = OnTxTimeoutFunc;
-    RadioEvents.RxDone = OnRxDoneFunc;
-
-    Radio.Init(&RadioEvents);   
-    Radio.SetChannel(RF_FREQUENCY);
-    Serial.println("LORAWAN setup complete.");
-    
-    Radio.SetTxConfig(MODEM_LORA, TX_OUTPUT_POWER, 0, LORA_BANDWIDTH,
-                      LORA_SPREADING_FACTOR, LORA_CODINGRATE,
-                      LORA_PREAMBLE_LENGTH, LORA_FIX_LENGTH_PAYLOAD_ON,
-                      true, 0, 0, LORA_IQ_INVERSION_ON, 3000);
-    Serial.println("Changed radio mode to transmitter");
 }

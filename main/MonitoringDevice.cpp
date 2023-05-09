@@ -14,8 +14,8 @@ void setupMonitoringDevice(){
     if (!bmp.begin()) {
         Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     }
-    pinMode(NOISE_PIN, INPUT);
-    pinMode(AIR_QUAL_PIN, INPUT);
+    // pinMode(NOISE_PIN, INPUT);
+    // pinMode(AIR_QUAL_PIN, INPUT);
     // Other monitoring device-specific setup
 }
 

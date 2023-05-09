@@ -7,8 +7,8 @@ void setupAdministrator()
     configureRadioForRx();
 
     // Initialize inputs specific to administrator device
-    pinMode(USER_INPUT_PIN_1_CONST, INPUT);
-    pinMode(USER_INPUT_PIN_2_CONST, INPUT);
+    // pinMode(USER_INPUT_PIN_1_CONST, INPUT);
+    // pinMode(USER_INPUT_PIN_2_CONST, INPUT);
     // Other administrator device-specific setup
 }
 

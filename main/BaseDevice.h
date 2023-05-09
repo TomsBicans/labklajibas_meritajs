@@ -34,14 +34,31 @@ extern bool loraIdle;
 extern SSD1306Wire factory_display;
 extern DisplayUi ui;
 
+enum DeviceRole
+{
+    ADMINISTRATOR,
+    MONITORING_DEVICE
+};
+
+struct Device
+{
+    void (*setupFunc)();
+    void (*loopFunc)();
+    void (*OnTxDoneFunc)();
+    void (*OnTxTimeoutFunc)();
+    void (*OnRxDoneFunc)(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr);
+    void (*displayDeviceInfoFunc)();
+};
+
 void setupBase();
 void configureRadioForTx();
 void configureRadioForRx();
-// RadioEvents_t setupLoRaWAN(
-//   void (*OnTxDoneFunc)(),
-//   void (*OnTxTimeoutFunc)(),
-//   void (*OnRxDoneFunc)(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
-// );
+void setupLoRaWAN(
+  RadioEvents_t *RadioEvents,
+  void (*OnTxDoneFunc)(),
+  void (*OnTxTimeoutFunc)(),
+  void (*OnRxDoneFunc)(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
+);
 
 
 

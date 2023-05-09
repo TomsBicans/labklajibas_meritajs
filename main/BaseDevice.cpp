@@ -1,3 +1,4 @@
+#include "radio/radio.h"
 #include <Arduino.h>
 #include <WiFi.h>
 
@@ -30,26 +31,27 @@ void setupBase(){
     delay(300);
 }
 
-// void setupLoRaWAN(
-//     void (*OnTxDoneFunc)(),
-//     void (*OnTxTimeoutFunc)(),
-//     void (*OnRxDoneFunc)(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
-// ) {
-//     Serial.println("Initializing LORAWAN setup.");
-//     Mcu.begin();
+void setupLoRaWAN(
+    RadioEvents_t *RadioEvents,
+    void (*OnTxDoneFunc)(),
+    void (*OnTxTimeoutFunc)(),
+    void (*OnRxDoneFunc)(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
+) {
+    Serial.println("Initializing LORAWAN setup.");
+    Mcu.begin();
 
-//     txNumber = 0;
-//     loraIdle = true;
+    txNumber = 0;
+    loraIdle = true;
 
-//     RadioEvents.TxDone = OnTxDoneFunc;
-//     RadioEvents.TxTimeout = OnTxTimeoutFunc;
-//     RadioEvents.RxDone = OnRxDoneFunc;
+    RadioEvents->TxDone = OnTxDoneFunc;
+    RadioEvents->TxTimeout = OnTxTimeoutFunc;
+    RadioEvents->RxDone = OnRxDoneFunc;
 
-//     Radio.Init(&RadioEvents);
+    Radio.Init(RadioEvents);
     
-//     Serial.println("LORAWAN setup complete.");
-//     configureRadioForTx();
-// }
+    Serial.println("LORAWAN setup complete.");
+    configureRadioForTx();
+}
 
 
 void configureRadioForTx(){
