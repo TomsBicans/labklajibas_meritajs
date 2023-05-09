@@ -59,42 +59,4 @@ void setupLoRaWAN(
   void (*OnTxTimeoutFunc)(),
   void (*OnRxDoneFunc)(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
 );
-
-
-
-// static RadioEvents_t RadioEvents;
-
-// class BaseDevice {
-// public:
-//     SSD1306Wire factory_display;
-//     DisplayUi ui;
-
-//     BaseDevice();
-//     virtual void setup() = 0;
-//     virtual void display_device_information() = 0;
-//     virtual void loop() = 0;
-
-//     void configureRadioForTx();
-//     void configureRadioForRx();
-//     void setupLoRaWAN();
-//     void sendLoRaMessage(const char* message);
-//     void loopLoRaWAN();
-
-// protected:
-//   static char txPacket[BUFFER_SIZE];
-//   static char rxPacket[BUFFER_SIZE];
-//   static double txNumber;
-//   static bool loraIdle;
-//   RadioEvents_t radioEvents;
-
-//   typedef void (*OnTxDonePtr)();
-//   typedef void (*OnTxTimeoutPtr)();
-//   typedef void (*OnRxDonePtr)(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr);
-
-//   OnTxDonePtr OnTxDoneFunc = nullptr;
-//   OnTxTimeoutPtr OnTxTimeoutFunc = nullptr;
-//   OnRxDonePtr OnRxDoneFunc = nullptr;
-
-// };
-
 #endif // BASE_DEVICE_H

@@ -65,37 +65,6 @@ void OnRxDoneMonitoringDevice(uint8_t *payload, uint16_t size, int16_t rssi, int
     loraIdle = true;
 }
 
-// MonitoringDevice::MonitoringDevice() : dht_sensor(DHT_PIN, DHT_TYPE), bmp() {
-//     OnTxDoneFunc = &MonitoringDevice::OnTxDone;
-//     OnTxTimeoutFunc = &MonitoringDevice::OnTxTimeout;
-//     OnRxDoneFunc = &MonitoringDevice::OnRxDone;
-// }
-
-// void MonitoringDevice::display_device_information() {
-//     factory_display.clear();
-//     factory_display.setFont(ArialMT_Plain_10);
-//     factory_display.drawString(0, 0, "LoRa Node");
-//     factory_display.drawString(0, 12, "Role: Monitoring Device");
-//     factory_display.drawString(0, 24, "Sensors: DHT, BMP, Noise, Air Quality");
-//     factory_display.display();
-// }
-
-// void MonitoringDevice::setup() {
-//     // Call the base class setup function
-//     BaseDevice::setup();
-//     BaseDevice::setupLoRaWAN();
-//     BaseDevice::configureRadioForTx();
-
-//     // Initialize sensors specific to monitoring device
-//     Serial.println("Initializing sensors.");
-//     dht_sensor.begin();
-//     if (!bmp.begin()) {
-//         Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-//     }
-//     pinMode(NOISE_PIN, INPUT);
-//     pinMode(AIR_QUAL_PIN, INPUT);
-//     // Other monitoring device-specific setup
-// }
 
 // void MonitoringDevice::loop(){
 //   measurement::entry data_point = measurement::entry{};
@@ -146,25 +115,4 @@ void OnRxDoneMonitoringDevice(uint8_t *payload, uint16_t size, int16_t rssi, int
 //     // // ATMOSPHERE SOUND PRESSURE
 //     // delay(800);
 //     // data_point.atm_sound_pressure = sensors::atm_sound_pressure(NOISE_SENSOR_A_PIN);
-// }
-
-// // Add other monitoring device-specific functionality implementations as needed
-// void MonitoringDevice::OnTxDone(void) {
-//   Serial.println("TX done......");
-//   loraIdle = true;
-// }
-
-// void MonitoringDevice::OnTxTimeout(void) {
-//   Radio.Sleep();
-//   Serial.println("TX Timeout......");
-//   loraIdle = true;
-// }
-
-// void MonitoringDevice::OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
-// {
-//     memcpy(rxPacket, payload, size );
-//     rxPacket[size]='\0';
-//     Radio.Sleep( );
-//     Serial.printf("\r\nreceived packet \"%s\" with rssi %d , length %d\r\n",rxPacket,rssi,size);
-//     loraIdle = true;
 // }
