@@ -65,8 +65,6 @@ void OnRxDoneMonitoringDevice(uint8_t *payload, uint16_t size, int16_t rssi, int
     loraIdle = true;
 }
 
-
-
 // MonitoringDevice::MonitoringDevice() : dht_sensor(DHT_PIN, DHT_TYPE), bmp() {
 //     OnTxDoneFunc = &MonitoringDevice::OnTxDone;
 //     OnTxTimeoutFunc = &MonitoringDevice::OnTxTimeout;

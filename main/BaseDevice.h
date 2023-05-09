@@ -29,7 +29,7 @@ extern char txpacket[BUFFER_SIZE];
 extern char rxpacket[BUFFER_SIZE];
 extern double txNumber;
 extern bool loraIdle;
-extern RadioEvents_t RadioEvents;
+// extern RadioEvents_t RadioEvents;
 
 extern SSD1306Wire factory_display;
 extern DisplayUi ui;

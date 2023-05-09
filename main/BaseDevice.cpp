@@ -9,7 +9,7 @@ char txpacket[BUFFER_SIZE];
 char rxpacket[BUFFER_SIZE];
 double txNumber;
 bool loraIdle = true;
-RadioEvents_t RadioEvents;
+// RadioEvents_t RadioEvents;
 
 SSD1306Wire factory_display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED);
 DisplayUi ui(&factory_display);
@@ -48,6 +48,7 @@ void setupBase(){
 //     Radio.Init(&RadioEvents);
     
 //     Serial.println("LORAWAN setup complete.");
+//     configureRadioForTx();
 // }
 
 

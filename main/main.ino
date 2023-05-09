@@ -26,6 +26,7 @@ void setupLoRaWAN(
   void (*OnRxDoneFunc)(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
 );
 
+static RadioEvents_t RadioEvents;
 DeviceRole deviceRole = MONITORING_DEVICE; // Set the device role here
 Device device;
 
@@ -65,7 +66,7 @@ void setup()
       device.OnTxTimeoutFunc,
       device.OnRxDoneFunc);
     // Setup for the role
-    device.setupFunc();
+    // device.setupFunc();
     device.displayDeviceInfoFunc();
 }
 
@@ -75,6 +76,7 @@ void loop()
     {
         device.loopFunc();
     }
+    Radio.IrqProcess();
 }
 
 void setupLoRaWAN(
@@ -102,4 +104,3 @@ void setupLoRaWAN(
                       true, 0, 0, LORA_IQ_INVERSION_ON, 3000);
     Serial.println("Changed radio mode to transmitter");
 }
-
