@@ -5,6 +5,7 @@
 DHT dht_sensor(DHT_PIN, DHT_TYPE);
 Adafruit_BMP085 bmp;
 
+
 void setupMonitoringDevice(){
     configureRadioForTx();
 
@@ -21,48 +22,52 @@ void setupMonitoringDevice(){
 
 void loopMonitoringDevice(){
     // Implement loop logic for monitoring device
-    if(loraIdle == true)
+    if(g_deviceState.loraIdle == true)
     {
       delay(1000);
-      txNumber += 0.01;
-      sprintf(txpacket,"Hello world number %0.2f",txNumber);  //start a package
+      g_deviceState.txNumber += 0.01;
+      sprintf(g_deviceState.txpacket,"Hello world number %0.3f",g_deviceState.txNumber);  //start a package
     
-      Serial.printf("\r\nsending packet \"%s\" , length %d\r\n",txpacket, strlen(txpacket));
-
-      Radio.Send( (uint8_t *)txpacket, strlen(txpacket) ); //send the package out	
-      loraIdle = false;
+      Serial.printf("\r\nsending packet \"%s\" , length %d\r\n",g_deviceState.txpacket, strlen(g_deviceState.txpacket));
+      transmissionStats.startTransmission();
+      Radio.Send( (uint8_t *)g_deviceState.txpacket, strlen(g_deviceState.txpacket) ); //send the package out	
+      g_deviceState.loraIdle = false;
     }
 }
 
 void displayDeviceInfoMonitoringDevice(){
-    factory_display.clear();
-    factory_display.setFont(ArialMT_Plain_10);
-    factory_display.drawString(0, 0, "LoRa Node");
-    factory_display.drawString(0, 12, "Role: Monitoring Device");
-    factory_display.drawString(0, 24, "Sensors: DHT, BMP, Noise, Air Quality");
-    factory_display.display();
+    g_deviceState.factory_display.clear();
+    g_deviceState.factory_display.setFont(ArialMT_Plain_10);
+    g_deviceState.factory_display.drawString(0, 0, "Role: Monitoring Device");
+    g_deviceState.factory_display.display();
 }
 
 void OnTxDoneMonitoringDevice(){
     // Implement OnTxDone logic for monitoring device
     Serial.println("TX done......");
-    loraIdle = true;
+    g_deviceState.loraIdle = true;
+
+    //End the transmission and update the status.
+    transmissionStats.endTransmission(strlen(g_deviceState.txpacket));
+    displayTransmissionStats(transmissionStats);
 }
 
 void OnTxTimeoutMonitoringDevice(){
     // Implement OnTxTimeout logic for monitoring device
     Radio.Sleep( );
     Serial.println("TX Timeout......");
-    loraIdle = true;
+    g_deviceState.loraIdle = true;
 }
 
 void OnRxDoneMonitoringDevice(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr){
     //Implement OnRxDone logic for administrator
-    memcpy(rxpacket, payload, size );
-    rxpacket[size]='\0';
+    memcpy(g_deviceState.rxpacket, payload, size );
+    g_deviceState.rxpacket[size]='\0';
     Radio.Sleep( );
-    Serial.printf("\r\nreceived packet \"%s\" with rssi %d , length %d\r\n",rxpacket,rssi,size);
-    loraIdle = true;
+    Serial.printf("\r\nreceived packet \"%s\" with rssi %d , length %d\r\n",g_deviceState.rxpacket,rssi,size);
+    receiverStats.packetReceived(size, rssi, snr);
+    displayReceiverStats(receiverStats);
+    g_deviceState.loraIdle = true;
 }
 
 

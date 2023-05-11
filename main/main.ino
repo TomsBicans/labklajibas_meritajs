@@ -6,7 +6,7 @@
 
 // Constants definitions
 static RadioEvents_t RadioEvents;
-DeviceRole deviceRole = MONITORING_DEVICE; // Set the device role here
+DeviceRole deviceRole = ADMINISTRATOR; // Set the device role here
 
 Device assignRoleFunctions(DeviceRole role)
 {

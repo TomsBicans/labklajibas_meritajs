@@ -5,6 +5,7 @@
 #include "HT_SSD1306Wire.h"
 #include "HT_DisplayUi.h"
 #include "LoRaWan_APP.h"
+#include "DeviceStats.h"
 
 #define RF_FREQUENCY                                915000000 // Hz
 #define TX_OUTPUT_POWER                             5        // dBm
@@ -23,16 +24,12 @@
 #define LORA_IQ_INVERSION_ON                        false
 
 #define RX_TIMEOUT_VALUE                            1000
-#define BUFFER_SIZE                                 30 // Define the payload size here
 
-extern char txpacket[BUFFER_SIZE];
-extern char rxpacket[BUFFER_SIZE];
-extern double txNumber;
-extern bool loraIdle;
-// extern RadioEvents_t RadioEvents;
 
-extern SSD1306Wire factory_display;
-extern DisplayUi ui;
+extern DeviceState g_deviceState;
+extern DeviceInformation deviceInformation;
+extern ReceiverStats receiverStats;
+extern TransmissionStats transmissionStats;
 
 enum DeviceRole
 {
@@ -59,4 +56,8 @@ void setupLoRaWAN(
   void (*OnTxTimeoutFunc)(),
   void (*OnRxDoneFunc)(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
 );
+
+// Utility functions
+void displayTransmissionStats(const TransmissionStats &st);
+void displayReceiverStats(const ReceiverStats &st);
 #endif // BASE_DEVICE_H

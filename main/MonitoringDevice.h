@@ -18,4 +18,5 @@ void OnTxDoneMonitoringDevice();
 void OnTxTimeoutMonitoringDevice();
 void OnRxDoneMonitoringDevice(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr);
 
+// Helper functions
 #endif // MONITORING_DEVICE_H
