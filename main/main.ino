@@ -4,9 +4,18 @@
 #include "AdministratorDevice.h"
 #include "MonitoringDevice.h"
 
+// TESTS and modules
+#include <ArduinoUnit.h>
+#include "TestMeasurement.h"
+#include "TestTimer.h"
+#include "TestQueue.h"
+#include "TestLinkedList.h"
+#include "TestLogger.h"
+
+
 // Constants definitions
 static RadioEvents_t RadioEvents;
-DeviceRole deviceRole = ADMINISTRATOR; // Set the device role here
+DeviceRole deviceRole = MONITORING_DEVICE; // Set the device role here
 
 Device assignRoleFunctions(DeviceRole role)
 {
@@ -53,6 +62,7 @@ void setup()
 
 void loop()
 {
+    Test::run();
     if (device.loopFunc)
     {
         device.loopFunc();
