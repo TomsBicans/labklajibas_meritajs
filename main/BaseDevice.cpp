@@ -10,9 +10,6 @@ DeviceState g_deviceState;
 TransmissionStats transmissionStats;
 ReceiverStats receiverStats;
 DeviceInformation deviceInformation;
-// SSD1306Wire factory_display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED);
-// DisplayUi ui(&factory_display);
-
 
 void setupBase(){
     long int start = millis();
