@@ -11,11 +11,12 @@
 #include "TestQueue.h"
 #include "TestLinkedList.h"
 #include "TestLogger.h"
+#include "Logger.h"
 
 
 // Constants definitions
 static RadioEvents_t RadioEvents;
-DeviceRole deviceRole = MONITORING_DEVICE; // Set the device role here
+DeviceRole deviceRole = LOG_PRINTER; // Set the device role here
 
 Device assignRoleFunctions(DeviceRole role)
 {
@@ -55,6 +56,14 @@ void setup()
       device.OnTxTimeoutFunc,
       device.OnRxDoneFunc
     );
+    if (deviceRole == LOG_PRINTER){
+      uint32_t logCount = logger.getLogCount();
+        for (uint32_t i = 0; i < logCount; ++i) {
+            LogEntry entry = logger.getLog(i);
+            Serial.println(String("Log ") + i + ": " + entry.toString());
+        }
+        while (true) delay(10000); // Halt the main loop
+    }
     // Setup for the role
     device.setupFunc();
     device.displayDeviceInfoFunc();

@@ -1,4 +1,10 @@
+#ifndef LOGGER_H
+#define LOGGER_H
+
 #include <Preferences.h>
+#include <stdio.h>
+
+constexpr const char* LOGGER_NAMESPACE = "logger";
 
 enum SemanticValue : uint8_t {
   // Sensor readings
@@ -28,10 +34,21 @@ union NumericValue {
 struct LogEntry {
   uint8_t targetDevice;
   uint8_t originDevice;
+  uint32_t x_id;
   SemanticValue semanticValue;
   unsigned long timestamp;
   NumericValue numericValue;
   bool isFloat;
+
+  String toString() const {
+    char buffer[256]; // Adjust the buffer size according to your needs
+    snprintf(buffer, sizeof(buffer),
+             "X_ID: %lu, Target Device: %u, Origin Device: %u, Semantic Value: %u, Timestamp: %lu, Numeric Value: %s, Is Float: %s",
+             x_id, targetDevice, originDevice, static_cast<uint8_t>(semanticValue), timestamp,
+             isFloat ? String(numericValue.floatValue).c_str() : String(numericValue.intValue).c_str(),
+             isFloat ? "True" : "False");
+    return String(buffer);
+  }
 };
 
 // Logger class
@@ -43,11 +60,13 @@ class Logger {
     const char* logCountKey = "logcount";
 
   public:
-    Logger();
+    Logger(const char* namespaceString);
 
-    void log(uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, float numericValue);
-    void log(uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, long int numericValue);
+    void log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, float numericValue);
+    void log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, long int numericValue);
     void clearLogs();
     uint32_t getLogCount();
     LogEntry getLog(uint32_t index);
 };
+
+#endif  // LOGGER_H

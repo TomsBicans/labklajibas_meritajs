@@ -1,12 +1,13 @@
 #include "Logger.h"
 
-Logger::Logger() {
-  preferences.begin("logger", false);
+Logger::Logger(const char* namespaceString) {
+  preferences.begin(namespaceString, false);
   logCount = preferences.getUInt(logCountKey, 0);
 }
 
-void Logger::log(uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, float numericValue) {
+void Logger::log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, float numericValue) {
   LogEntry entry;
+  entry.x_id = x_id;
   entry.targetDevice = targetDevice;
   entry.originDevice = originDevice;
   entry.semanticValue = semanticValue;
@@ -18,8 +19,9 @@ void Logger::log(uint8_t targetDevice, uint8_t originDevice, SemanticValue seman
   preferences.putUInt(logCountKey, ++logCount);
 }
 
-void Logger::log(uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, long int numericValue) {
+void Logger::log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, long int numericValue) {
   LogEntry entry;
+  entry.x_id = x_id;
   entry.targetDevice = targetDevice;
   entry.originDevice = originDevice;
   entry.semanticValue = semanticValue;

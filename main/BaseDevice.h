@@ -6,6 +6,7 @@
 #include "HT_DisplayUi.h"
 #include "LoRaWan_APP.h"
 #include "DeviceStats.h"
+#include "Logger.h"
 
 #define RF_FREQUENCY                                915000000 // Hz
 #define TX_OUTPUT_POWER                             5        // dBm
@@ -30,11 +31,13 @@ extern DeviceState g_deviceState;
 extern DeviceInformation deviceInformation;
 extern ReceiverStats receiverStats;
 extern TransmissionStats transmissionStats;
+extern Logger logger;
 
 enum DeviceRole
 {
     ADMINISTRATOR,
-    MONITORING_DEVICE
+    MONITORING_DEVICE,
+    LOG_PRINTER
 };
 
 struct Device

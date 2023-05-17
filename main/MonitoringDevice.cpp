@@ -1,6 +1,7 @@
 #include "BaseDevice.h"
 #include "MonitoringDevice.h"
 #include "Measurement.h"
+#include "Logger.h"
 
 DHT dht_sensor(DHT_PIN, DHT_TYPE);
 Adafruit_BMP085 bmp;

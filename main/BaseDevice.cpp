@@ -10,6 +10,7 @@ DeviceState g_deviceState;
 TransmissionStats transmissionStats;
 ReceiverStats receiverStats;
 DeviceInformation deviceInformation;
+Logger logger(LOGGER_NAMESPACE);
 
 void setupBase(){
     long int start = millis();
@@ -94,3 +95,4 @@ void displayReceiverStats(const ReceiverStats &st){
     g_deviceState.factory_display.drawString(0, 36, stats);
     g_deviceState.factory_display.display();
 }
+
