@@ -8,6 +8,10 @@
 #include "DeviceStats.h"
 #include "Logger.h"
 
+#include "util.h"
+#include "print.h"
+#include "Measurement.h"
+
 #define RF_FREQUENCY                                915000000 // Hz
 #define TX_OUTPUT_POWER                             5        // dBm
 #define LORA_BANDWIDTH                              0         // [0: 125 kHz,
@@ -63,4 +67,11 @@ void setupLoRaWAN(
 // Utility functions
 void displayTransmissionStats(const TransmissionStats &st);
 void displayReceiverStats(const ReceiverStats &st);
+
+// Logger functions
+void logDeviceState(Logger *logger, const DeviceState state);
+void logTransmissionStats(Logger *logger, const TransmissionStats stats);
+void logReceiverStats(Logger *logger, const ReceiverStats stats);
+void logDeviceInformation(Logger *logger, const DeviceInformation info);
+
 #endif // BASE_DEVICE_H

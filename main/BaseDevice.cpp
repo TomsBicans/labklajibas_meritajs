@@ -3,8 +3,7 @@
 #include <WiFi.h>
 
 #include "BaseDevice.h"
-#include "util.h"
-#include "print.h"
+
 
 DeviceState g_deviceState;
 TransmissionStats transmissionStats;
@@ -95,4 +94,38 @@ void displayReceiverStats(const ReceiverStats &st){
     g_deviceState.factory_display.drawString(0, 36, stats);
     g_deviceState.factory_display.display();
 }
+
+void logDeviceState(Logger *logger, const DeviceState state) {
+    uint32_t x_id = millis();
+    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, DEVICE_STATE_FIELD1, static_cast<long int>(state.loraIdle));
+}
+
+void logTransmissionStats(Logger *logger, const TransmissionStats stats) {
+    uint32_t x_id = millis();
+    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, TRANSMISSION_STATS_FIELD1, static_cast<long int>(stats.getPacketsSent()));
+    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, TRANSMISSION_STATS_FIELD2, static_cast<long int>(stats.getAveragePacketSendingTime()));
+    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, TRANSMISSION_STATS_FIELD3, static_cast<long int>(stats.getTotalBytesSent()));
+    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, TRANSMISSION_STATS_FIELD4, static_cast<long int>(stats.getTotalOnAirTime()));
+    Serial.println("Wrote stats to logger.");
+}
+
+void logReceiverStats(Logger *logger, const ReceiverStats stats) {
+    uint32_t x_id = millis();
+    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, RECEIVER_STATS_FIELD1, static_cast<long int>(stats.getPacketsReceived()));
+    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, RECEIVER_STATS_FIELD2, static_cast<long int>(stats.getTotalBytesReceived()));
+    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, RECEIVER_STATS_FIELD3, static_cast<float>(stats.getAverageRssi()));
+    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, RECEIVER_STATS_FIELD4, static_cast<float>(stats.getAverageSnr()));
+}
+
+void logDeviceInformation(Logger *logger, const DeviceInformation info) {
+    uint32_t x_id = millis();
+    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, DEVICE_INFORMATION_FIELD1, static_cast<long int>(info.getTotalDeviceRuntime()));
+    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, DEVICE_INFORMATION_FIELD2, info.getBatteryLevel());
+}
+
+void logSensorReadings(Logger *logger, const measurement::entry entry){
+  uint32_t x_id = millis();
+  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, DEVICE_INFORMATION_FIELD1, info.getTotalDeviceRuntime());
+}
+
 
