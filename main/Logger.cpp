@@ -50,7 +50,7 @@ void Logger::log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, Sema
   entry.numericValue.intValue = numericValue;
   entry.isFloat = false;
 
-  write_log();
+  write_log(entry);
   delay(20);
 }
 
