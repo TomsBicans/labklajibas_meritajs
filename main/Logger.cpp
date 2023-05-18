@@ -10,6 +10,8 @@ Logger::Logger(const char* namespaceString, const char* dataFileName): namespace
 void Logger::write_log(LogEntry entry){
   preferences.begin(this->namespaceString, false);
   logCount = preferences.getUInt(logCountKey, 0);
+  Serial.print(logCount);
+  Serial.println(" log entries found.");
   File file = SPIFFS.open(dataFileName, "a");
     if (!file) {
       Serial.println("Failed to open log file for writing.");
