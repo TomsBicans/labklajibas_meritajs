@@ -9,7 +9,7 @@ DeviceState g_deviceState;
 TransmissionStats transmissionStats;
 ReceiverStats receiverStats;
 DeviceInformation deviceInformation;
-Logger logger(LOGGER_NAMESPACE, "logs.bin");
+Logger logger(LOGGER_NAMESPACE, "/logs.bin");
 
 void setupBase(){
     long int start = millis();

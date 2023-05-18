@@ -6,6 +6,8 @@
 #include "FS.h"
 #include "SPIFFS.h"
 
+#define FORMAT_SPIFFS_IF_FAILED true
+
 enum SemanticValue : uint8_t {
   // Sensor readings
   SENSOR_HUMIDITY = 1,
@@ -103,6 +105,7 @@ class Logger {
     void clearLogs();
     uint32_t getLogCount();
     LogEntry getLog(uint32_t index);
+    void printLogs();
 };
 
 #endif  // LOGGER_H

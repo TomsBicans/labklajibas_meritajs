@@ -17,8 +17,8 @@
 
 // Constants definitions
 static RadioEvents_t RadioEvents;
-bool purgeNVS = true;
-DeviceRole deviceRole = MONITORING_DEVICE; // Set the device role here
+bool purgeNVS = false;
+DeviceRole deviceRole = LOG_PRINTER; // Set the device role here
 
 Device assignRoleFunctions(DeviceRole role)
 {
@@ -59,19 +59,12 @@ void setup()
       device.OnRxDoneFunc
     );
     if (deviceRole == LOG_PRINTER){
-      Serial.println("Printing logs...");
-      uint32_t logCount = logger.getLogCount();
-      Serial.print(logCount);
-      Serial.println(" log entries found");
-        for (uint32_t i = 0; i < logCount; ++i) {
-            LogEntry entry = logger.getLog(i);
-            Serial.println(String("Log ") + i + ": " + entry.toString());
-        }
-        if (purgeNVS){
-          Serial.println("Deleting all logger storage.");
-          logger.clearLogs();
-        }
-        while (true) delay(10000); // Halt the program
+      logger.printLogs();
+      if (purgeNVS){
+        Serial.println("Deleting all logger storage.");
+        logger.clearLogs();
+      }
+      while (true) delay(10000); // Halt the program
     }
     // Setup for the role
     device.setupFunc();
