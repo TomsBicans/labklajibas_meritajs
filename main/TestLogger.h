@@ -2,9 +2,10 @@
 #include "Logger.h"
 
 const char* test_namespace = "logger_test";
+const char* test_file = "/test.bin";
 
 test(logging_float_value) {
-  Logger logger(test_namespace, "/test.bin");
+  Logger logger(test_namespace, test_file);
   logger.clearLogs();
 
   uint32_t x_id = millis();
@@ -28,7 +29,7 @@ test(logging_float_value) {
 }
 
 test(logging_int_value) {
-  Logger logger(test_namespace,"/test.bin");
+  Logger logger(test_namespace,test_file);
   logger.clearLogs();
 
   uint32_t x_id = millis();
@@ -52,7 +53,7 @@ test(logging_int_value) {
 }
 
 test(clear_logs) {
-  Logger logger(test_namespace, "/test.bin");
+  Logger logger(test_namespace, test_file);
   logger.clearLogs();
 
   uint32_t x_id = millis();
@@ -68,7 +69,7 @@ test(clear_logs) {
 
 
 test(multiple_entries) {
-  Logger logger(test_namespace, "/test.bin");
+  Logger logger(test_namespace, test_file);
   logger.clearLogs();
 
   uint32_t x_id = millis();
@@ -84,7 +85,7 @@ test(multiple_entries) {
 
 
 test(check_entries) {
-  Logger logger(test_namespace, "/test.bin");
+  Logger logger(test_namespace, test_file);
   logger.clearLogs();
   uint32_t x_id = millis();
 
@@ -111,7 +112,7 @@ test(check_entries) {
 }
 
 test(iterate_entries) {
-  Logger logger(test_namespace, "/test.bin");
+  Logger logger(test_namespace, test_file);
   logger.clearLogs();
   unsigned long x_id = millis();
   // Log 10 entries.
