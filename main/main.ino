@@ -1,5 +1,6 @@
 #include "LoRaWan_APP.h"
 #include "Arduino.h"
+// Core functionality
 #include "BaseDevice.h"
 #include "AdministratorDevice.h"
 #include "MonitoringDevice.h"
@@ -16,7 +17,8 @@
 
 // Constants definitions
 static RadioEvents_t RadioEvents;
-DeviceRole deviceRole = LOG_PRINTER; // Set the device role here
+bool purgeNVS = true;
+DeviceRole deviceRole = MONITORING_DEVICE; // Set the device role here
 
 Device assignRoleFunctions(DeviceRole role)
 {
@@ -57,12 +59,19 @@ void setup()
       device.OnRxDoneFunc
     );
     if (deviceRole == LOG_PRINTER){
+      Serial.println("Printing logs...");
       uint32_t logCount = logger.getLogCount();
+      Serial.print(logCount);
+      Serial.println(" log entries found");
         for (uint32_t i = 0; i < logCount; ++i) {
             LogEntry entry = logger.getLog(i);
             Serial.println(String("Log ") + i + ": " + entry.toString());
         }
-        while (true) delay(10000); // Halt the main loop
+        if (purgeNVS){
+          Serial.println("Deleting all logger storage.");
+          logger.clearLogs();
+        }
+        while (true) delay(10000); // Halt the program
     }
     // Setup for the role
     device.setupFunc();
@@ -71,7 +80,7 @@ void setup()
 
 void loop()
 {
-    Test::run();
+    // Test::run();
     if (device.loopFunc)
     {
         device.loopFunc();
