@@ -7,6 +7,7 @@ namespace measurement {
     result.atm_temperature = e1.atm_temperature + e2.atm_temperature;
     result.atm_humidity = e1.atm_humidity + e2.atm_humidity;
     result.atm_air_pressure = e1.atm_air_pressure + e2.atm_air_pressure;
+    result.atm_altitude = e1.atm_altitude + e2.atm_altitude;
     result.atm_air_particle = e1.atm_air_particle + e2.atm_air_particle;
     result.atm_air_smoke = e1.atm_air_smoke + e2.atm_air_smoke;
     result.atm_CO2_ammount = e1.atm_CO2_ammount + e2.atm_CO2_ammount;
@@ -22,6 +23,7 @@ namespace measurement {
     result.atm_temperature = e.atm_temperature / num;
     result.atm_humidity = e.atm_humidity / num;
     result.atm_air_pressure = e.atm_air_pressure / num;
+    result.atm_altitude = e.atm_altitude / num;
     result.atm_air_particle = e.atm_air_particle / num;
     result.atm_air_smoke = e.atm_air_smoke / num;
     result.atm_CO2_ammount = e.atm_CO2_ammount / num;
@@ -42,6 +44,8 @@ namespace measurement {
     Serial.print(e.atm_humidity);
     Serial.print(",");
     Serial.print(e.atm_air_pressure);
+    Serial.print(",");
+    Serial.print(e.atm_altitude);
     Serial.print(",");
     Serial.print(e.atm_air_particle);
     Serial.print(",");
@@ -68,6 +72,8 @@ namespace measurement {
     Serial.print("atm_humidity");
     Serial.print(",");
     Serial.print("atm_air_pressure");
+    Serial.print(",");
+    Serial.print("atm_altitude");
     Serial.print(",");
     Serial.print("atm_air_particle");
     Serial.print(",");

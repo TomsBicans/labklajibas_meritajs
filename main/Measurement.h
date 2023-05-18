@@ -15,6 +15,7 @@ namespace measurement {
     float atm_temperature = NOVAL;
     float atm_humidity = NOVAL;
     float atm_air_pressure = NOVAL;
+    float atm_altitude = NOVAL;
     float atm_air_particle = NOVAL;
     float atm_air_smoke = NOVAL;
     float atm_CO2_ammount = NOVAL;
