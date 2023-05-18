@@ -3,6 +3,8 @@
 
 #include <Preferences.h>
 #include <stdio.h>
+#include "FS.h"
+#include "SPIFFS.h"
 
 enum SemanticValue : uint8_t {
   // Sensor readings
@@ -90,10 +92,11 @@ class Logger {
     uint32_t logCount;
     const char* logCountKey = "logcount";
     const char* namespaceString;
+    const char* dataFileName;
     void write_log(LogEntry entry);
 
   public:
-    Logger(const char* namespaceString);
+    Logger(const char* namespaceString, const char* dataFileName);
 
     void log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, float numericValue);
     void log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, long int numericValue);

@@ -1,6 +1,6 @@
 #include "Logger.h"
 
-Logger::Logger(const char* namespaceString): namespaceString(namespaceString) {
+Logger::Logger(const char* namespaceString, const char* dataFileName): namespaceString(namespaceString), dataFileName(dataFileName) {
   logCount = getLogCount();
 }
 
