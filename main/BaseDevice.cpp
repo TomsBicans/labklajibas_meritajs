@@ -125,7 +125,17 @@ void logDeviceInformation(Logger *logger, const DeviceInformation info) {
 
 void logSensorReadings(Logger *logger, const measurement::entry entry){
   uint32_t x_id = millis();
-  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, DEVICE_INFORMATION_FIELD1, info.getTotalDeviceRuntime());
+  logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, ENTRY_ATM_TEMPERATURE, entry.atm_temperature);
+  logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, ENTRY_ATM_HUMIDITY, entry.atm_humidity);
+  logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, ENTRY_ATM_AIR_PRESSURE, entry.atm_air_pressure);
+  logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, ENTRY_ALTITUDE, entry.atm_altitude);
+  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, SENSOR_READINGS_FIELD5, entry.atm_air_particle);
+  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, SENSOR_READINGS_FIELD6, entry.atm_air_smoke);
+  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, SENSOR_READINGS_FIELD7, entry.atm_CO2_ammount);
+  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, SENSOR_READINGS_FIELD8, entry.atm_sound_pressure);
+  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, SENSOR_READINGS_FIELD9, entry.light_intensity);
+  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, SENSOR_READINGS_FIELD10, entry.UV_intensity);
+  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, SENSOR_READINGS_FIELD11, entry.quality_rating);
+  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, SENSOR_READINGS_FIELD12, static_cast<long int>(entry.user_likes));
+  Serial.println("Logged sensor readings.");
 }
-
-
