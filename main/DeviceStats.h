@@ -139,7 +139,7 @@ private:
 };
 
 
-#define BUFFER_SIZE                                 50 // Define the payload size here
+#define BUFFER_SIZE                                 256 // Define the payload size here
 class DeviceState {
 public:
     DeviceState()
