@@ -50,7 +50,7 @@ void OnTxDoneMonitoringDevice(){
 
     //End the transmission and update the status.
     transmissionStats.endTransmission(strlen(g_deviceState.txpacket));
-    logTransmissionStats(&logger, transmissionStats);
+    logTransmissionStats(&logger, ADMINISTRATOR, MONITORING_DEVICE, transmissionStats);
     displayTransmissionStats(transmissionStats);
 }
 

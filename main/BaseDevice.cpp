@@ -95,47 +95,47 @@ void displayReceiverStats(const ReceiverStats &st){
     g_deviceState.factory_display.display();
 }
 
-void logDeviceState(Logger *logger, const DeviceState state) {
+void logDeviceState(Logger *logger, DeviceRole target, DeviceRole origin, const DeviceState state) {
     uint32_t x_id = millis();
-    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, DEVICE_STATE_FIELD1, static_cast<long int>(state.loraIdle));
+    logger->log(x_id, target, origin, DEVICE_STATE_FIELD1, static_cast<long int>(state.loraIdle));
 }
 
-void logTransmissionStats(Logger *logger, const TransmissionStats stats) {
+void logTransmissionStats(Logger *logger, DeviceRole target, DeviceRole origin, const TransmissionStats stats) {
     uint32_t x_id = millis();
-    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, TRANSMISSION_STATS_FIELD1, static_cast<long int>(stats.getPacketsSent()));
-    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, TRANSMISSION_STATS_FIELD2, static_cast<long int>(stats.getAveragePacketSendingTime()));
-    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, TRANSMISSION_STATS_FIELD3, static_cast<long int>(stats.getTotalBytesSent()));
-    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, TRANSMISSION_STATS_FIELD4, static_cast<long int>(stats.getTotalOnAirTime()));
+    logger->log(x_id, target, origin, TRANSMISSION_STATS_FIELD1, static_cast<long int>(stats.getPacketsSent()));
+    logger->log(x_id, target, origin, TRANSMISSION_STATS_FIELD2, static_cast<long int>(stats.getAveragePacketSendingTime()));
+    logger->log(x_id, target, origin, TRANSMISSION_STATS_FIELD3, static_cast<long int>(stats.getTotalBytesSent()));
+    logger->log(x_id, target, origin, TRANSMISSION_STATS_FIELD4, static_cast<long int>(stats.getTotalOnAirTime()));
     Serial.println("Wrote stats to logger.");
 }
 
-void logReceiverStats(Logger *logger, const ReceiverStats stats) {
+void logReceiverStats(Logger *logger, DeviceRole target, DeviceRole origin, const ReceiverStats stats) {
     uint32_t x_id = millis();
-    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, RECEIVER_STATS_FIELD1, static_cast<long int>(stats.getPacketsReceived()));
-    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, RECEIVER_STATS_FIELD2, static_cast<long int>(stats.getTotalBytesReceived()));
-    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, RECEIVER_STATS_FIELD3, static_cast<float>(stats.getAverageRssi()));
-    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, RECEIVER_STATS_FIELD4, static_cast<float>(stats.getAverageSnr()));
+    logger->log(x_id, target, origin, RECEIVER_STATS_FIELD1, static_cast<long int>(stats.getPacketsReceived()));
+    logger->log(x_id, target, origin, RECEIVER_STATS_FIELD2, static_cast<long int>(stats.getTotalBytesReceived()));
+    logger->log(x_id, target, origin, RECEIVER_STATS_FIELD3, static_cast<float>(stats.getAverageRssi()));
+    logger->log(x_id, target, origin, RECEIVER_STATS_FIELD4, static_cast<float>(stats.getAverageSnr()));
 }
 
-void logDeviceInformation(Logger *logger, const DeviceInformation info) {
+void logDeviceInformation(Logger *logger, DeviceRole target, DeviceRole origin, const DeviceInformation info) {
     uint32_t x_id = millis();
-    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, DEVICE_INFORMATION_FIELD1, static_cast<long int>(info.getTotalDeviceRuntime()));
-    logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, DEVICE_INFORMATION_FIELD2, info.getBatteryLevel());
+    logger->log(x_id, target, origin, DEVICE_INFORMATION_FIELD1, static_cast<long int>(info.getTotalDeviceRuntime()));
+    logger->log(x_id, target, origin, DEVICE_INFORMATION_FIELD2, info.getBatteryLevel());
 }
 
-void logSensorReadings(Logger *logger, const measurement::entry entry){
+void logSensorReadings(Logger *logger, DeviceRole target, DeviceRole origin, const measurement::entry entry){
   uint32_t x_id = millis();
-  logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, ENTRY_ATM_TEMPERATURE, entry.atm_temperature);
-  logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, ENTRY_ATM_HUMIDITY, entry.atm_humidity);
-  logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, ENTRY_ATM_AIR_PRESSURE, entry.atm_air_pressure);
-  logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, ENTRY_ALTITUDE, entry.atm_altitude);
-  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, SENSOR_READINGS_FIELD5, entry.atm_air_particle);
-  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, SENSOR_READINGS_FIELD6, entry.atm_air_smoke);
-  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, SENSOR_READINGS_FIELD7, entry.atm_CO2_ammount);
-  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, SENSOR_READINGS_FIELD8, entry.atm_sound_pressure);
-  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, SENSOR_READINGS_FIELD9, entry.light_intensity);
-  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, SENSOR_READINGS_FIELD10, entry.UV_intensity);
-  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, SENSOR_READINGS_FIELD11, entry.quality_rating);
-  // logger->log(x_id, ADMINISTRATOR, MONITORING_DEVICE, SENSOR_READINGS_FIELD12, static_cast<long int>(entry.user_likes));
+  logger->log(x_id, target, origin, ENTRY_ATM_TEMPERATURE, entry.atm_temperature);
+  logger->log(x_id, target, origin, ENTRY_ATM_HUMIDITY, entry.atm_humidity);
+  logger->log(x_id, target, origin, ENTRY_ATM_AIR_PRESSURE, entry.atm_air_pressure);
+  logger->log(x_id, target, origin, ENTRY_ALTITUDE, entry.atm_altitude);
+  // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD5, entry.atm_air_particle);
+  // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD6, entry.atm_air_smoke);
+  // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD7, entry.atm_CO2_ammount);
+  // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD8, entry.atm_sound_pressure);
+  // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD9, entry.light_intensity);
+  // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD10, entry.UV_intensity);
+  // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD11, entry.quality_rating);
+  // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD12, static_cast<long int>(entry.user_likes));
   Serial.println("Logged sensor readings.");
 }

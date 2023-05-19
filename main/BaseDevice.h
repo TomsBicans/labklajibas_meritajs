@@ -69,9 +69,9 @@ void displayTransmissionStats(const TransmissionStats &st);
 void displayReceiverStats(const ReceiverStats &st);
 
 // Logger functions
-void logDeviceState(Logger *logger, const DeviceState state);
-void logTransmissionStats(Logger *logger, const TransmissionStats stats);
-void logReceiverStats(Logger *logger, const ReceiverStats stats);
-void logDeviceInformation(Logger *logger, const DeviceInformation info);
+void logDeviceState(      Logger *logger, DeviceRole target, DeviceRole origin, const DeviceState state);
+void logTransmissionStats(Logger *logger, DeviceRole target, DeviceRole origin, const TransmissionStats stats);
+void logReceiverStats(    Logger *logger, DeviceRole target, DeviceRole origin, const ReceiverStats stats);
+void logDeviceInformation(Logger *logger, DeviceRole target, DeviceRole origin, const DeviceInformation info);
 
 #endif // BASE_DEVICE_H
