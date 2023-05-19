@@ -37,7 +37,7 @@ void Logger::write_log(LogEntry entry){
   preferences.end();
 }
 
-void Logger::log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, float numericValue) {
+LogEntry Logger::log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, float numericValue) {
   LogEntry entry;
   entry.x_id = x_id;
   entry.targetDevice = targetDevice;
@@ -48,9 +48,10 @@ void Logger::log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, Sema
   entry.isFloat = true;
 
   write_log(entry);
+  return entry;
 }
 
-void Logger::log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, long int numericValue) {
+LogEntry Logger::log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, long int numericValue) {
   LogEntry entry;
   entry.x_id = x_id;
   entry.targetDevice = targetDevice;
@@ -61,6 +62,7 @@ void Logger::log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, Sema
   entry.isFloat = false;
 
   write_log(entry);
+  return entry;
 }
 
 void Logger::clearLogs() {

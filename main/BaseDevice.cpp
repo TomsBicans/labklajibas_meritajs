@@ -95,40 +95,56 @@ void displayReceiverStats(const ReceiverStats &st){
     g_deviceState.factory_display.display();
 }
 
-void logDeviceState(Logger *logger, DeviceRole target, DeviceRole origin, const DeviceState state) {
+LogPacket logDeviceState(Logger *logger, DeviceRole target, DeviceRole origin, const DeviceState state) {
+    LogPacket logData;
     uint32_t x_id = millis();
-    logger->log(x_id, target, origin, DEVICE_STATE_FIELD1, static_cast<long int>(state.loraIdle));
+    logData.entries[0] = logger->log(x_id, target, origin, DEVICE_STATE_FIELD1, static_cast<long int>(state.loraIdle));
+    logData.count = 1;
+    return logData;
 }
 
-void logTransmissionStats(Logger *logger, DeviceRole target, DeviceRole origin, const TransmissionStats stats) {
-    uint32_t x_id = millis();
-    logger->log(x_id, target, origin, TRANSMISSION_STATS_FIELD1, static_cast<long int>(stats.getPacketsSent()));
-    logger->log(x_id, target, origin, TRANSMISSION_STATS_FIELD2, static_cast<long int>(stats.getAveragePacketSendingTime()));
-    logger->log(x_id, target, origin, TRANSMISSION_STATS_FIELD3, static_cast<long int>(stats.getTotalBytesSent()));
-    logger->log(x_id, target, origin, TRANSMISSION_STATS_FIELD4, static_cast<long int>(stats.getTotalOnAirTime()));
-    Serial.println("Wrote stats to logger.");
-}
-
-void logReceiverStats(Logger *logger, DeviceRole target, DeviceRole origin, const ReceiverStats stats) {
-    uint32_t x_id = millis();
-    logger->log(x_id, target, origin, RECEIVER_STATS_FIELD1, static_cast<long int>(stats.getPacketsReceived()));
-    logger->log(x_id, target, origin, RECEIVER_STATS_FIELD2, static_cast<long int>(stats.getTotalBytesReceived()));
-    logger->log(x_id, target, origin, RECEIVER_STATS_FIELD3, static_cast<float>(stats.getAverageRssi()));
-    logger->log(x_id, target, origin, RECEIVER_STATS_FIELD4, static_cast<float>(stats.getAverageSnr()));
-}
-
-void logDeviceInformation(Logger *logger, DeviceRole target, DeviceRole origin, const DeviceInformation info) {
-    uint32_t x_id = millis();
-    logger->log(x_id, target, origin, DEVICE_INFORMATION_FIELD1, static_cast<long int>(info.getTotalDeviceRuntime()));
-    logger->log(x_id, target, origin, DEVICE_INFORMATION_FIELD2, info.getBatteryLevel());
-}
-
-void logSensorReadings(Logger *logger, DeviceRole target, DeviceRole origin, const measurement::entry entry){
+LogPacket logTransmissionStats(Logger *logger, DeviceRole target, DeviceRole origin, const TransmissionStats stats) {
+  LogPacket logData;
   uint32_t x_id = millis();
-  logger->log(x_id, target, origin, ENTRY_ATM_TEMPERATURE, entry.atm_temperature);
-  logger->log(x_id, target, origin, ENTRY_ATM_HUMIDITY, entry.atm_humidity);
-  logger->log(x_id, target, origin, ENTRY_ATM_AIR_PRESSURE, entry.atm_air_pressure);
-  logger->log(x_id, target, origin, ENTRY_ALTITUDE, entry.atm_altitude);
+  logData.entries[0] = logger->log(x_id, target, origin, TRANSMISSION_STATS_FIELD1, static_cast<long int>(stats.getPacketsSent()));
+  logData.entries[1] = logger->log(x_id, target, origin, TRANSMISSION_STATS_FIELD2, static_cast<long int>(stats.getAveragePacketSendingTime()));
+  logData.entries[2] = logger->log(x_id, target, origin, TRANSMISSION_STATS_FIELD3, static_cast<long int>(stats.getTotalBytesSent()));
+  logData.entries[3] = logger->log(x_id, target, origin, TRANSMISSION_STATS_FIELD4, static_cast<long int>(stats.getTotalOnAirTime()));
+  logData.count = 4;
+  Serial.println("Wrote stats to logger.");
+  return logData;
+}
+
+LogPacket logReceiverStats(Logger *logger, DeviceRole target, DeviceRole origin, const ReceiverStats stats) {
+  LogPacket logData;
+  uint32_t x_id = millis();
+  logData.entries[0] = logger->log(x_id, target, origin, RECEIVER_STATS_FIELD1, static_cast<long int>(stats.getPacketsReceived()));
+  logData.entries[1] = logger->log(x_id, target, origin, RECEIVER_STATS_FIELD2, static_cast<long int>(stats.getTotalBytesReceived()));
+  logData.entries[2] = logger->log(x_id, target, origin, RECEIVER_STATS_FIELD3, static_cast<float>(stats.getAverageRssi()));
+  logData.entries[3] = logger->log(x_id, target, origin, RECEIVER_STATS_FIELD4, static_cast<float>(stats.getAverageSnr()));
+  logData.count = 4;
+  return logData;
+}
+
+LogPacket logDeviceInformation(Logger *logger, DeviceRole target, DeviceRole origin, const DeviceInformation info) {
+  LogPacket logData;
+  uint32_t x_id = millis();
+  logData.entries[0] = logger->log(x_id, target, origin, DEVICE_INFORMATION_FIELD1, static_cast<long int>(info.getTotalDeviceRuntime()));
+  logData.entries[1] = logger->log(x_id, target, origin, DEVICE_INFORMATION_FIELD2, info.getBatteryLevel());
+  logData.count = 2;
+  return logData;
+}
+
+LogPacket logSensorReadings(Logger *logger, DeviceRole target, DeviceRole origin, const measurement::entry entry){
+  LogPacket logData;
+  uint32_t x_id = millis();
+  logData.entries[0] = logger->log(x_id, target, origin, ENTRY_ATM_TEMPERATURE, entry.atm_temperature);
+  logData.entries[1] = logger->log(x_id, target, origin, ENTRY_ATM_HUMIDITY, entry.atm_humidity);
+  logData.entries[2] = logger->log(x_id, target, origin, ENTRY_ATM_AIR_PRESSURE, entry.atm_air_pressure);
+  logData.entries[3] = logger->log(x_id, target, origin, ENTRY_ALTITUDE, entry.atm_altitude);
+  logData.count = 4;
+  Serial.println("Logged sensor readings.");
+  return logData;
   // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD5, entry.atm_air_particle);
   // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD6, entry.atm_air_smoke);
   // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD7, entry.atm_CO2_ammount);
@@ -137,5 +153,4 @@ void logSensorReadings(Logger *logger, DeviceRole target, DeviceRole origin, con
   // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD10, entry.UV_intensity);
   // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD11, entry.quality_rating);
   // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD12, static_cast<long int>(entry.user_likes));
-  Serial.println("Logged sensor readings.");
 }

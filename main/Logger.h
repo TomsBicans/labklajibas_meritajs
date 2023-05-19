@@ -84,6 +84,12 @@ struct LogEntry {
   }
 };
 
+struct LogPacket {
+  LogEntry entries[10];
+  size_t count;
+};
+
+
 constexpr const char* LOGGER_NAMESPACE = "logger";
 constexpr const char* LOGGER_TEST_NAMESPACE = "loggertest";
 
@@ -100,8 +106,8 @@ class Logger {
   public:
     Logger(const char* namespaceString, const char* dataFileName);
 
-    void log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, float numericValue);
-    void log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, long int numericValue);
+    LogEntry log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, float numericValue);
+    LogEntry log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, long int numericValue);
     void clearLogs();
     uint32_t getLogCount();
     LogEntry getLog(uint32_t index);
