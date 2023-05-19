@@ -58,14 +58,24 @@ private:
 
 class ReceiverStats {
 public:
+    static const size_t NUM_SAMPLES = 10;
     ReceiverStats() 
-        : totalPacketsReceived(0), totalBytesReceived(0), totalRssi(0), totalSnr(0) {}
+        : totalPacketsReceived(0), totalBytesReceived(0), rssiIndex(0), snrIndex(0), rssiCount(0), snrCount(0) {
+            memset(rssiSamples, 0, sizeof(rssiSamples));
+            memset(snrSamples, 0, sizeof(snrSamples));
+        }
 
     void packetReceived(uint16_t bytesReceived, int16_t rssi, int8_t snr) {
         this->totalPacketsReceived++;
         this->totalBytesReceived += bytesReceived;
-        this->totalRssi += rssi;
-        this->totalSnr += snr;
+        
+        rssiSamples[rssiIndex] = rssi;
+        rssiIndex = (rssiIndex + 1) % NUM_SAMPLES;
+        rssiCount = min(rssiCount + 1, NUM_SAMPLES);
+
+        snrSamples[snrIndex] = snr;
+        snrIndex = (snrIndex + 1) % NUM_SAMPLES;
+        snrCount = min(snrCount + 1, NUM_SAMPLES);
     }
 
     uint32_t getPacketsReceived() const {
@@ -77,12 +87,23 @@ public:
     }
 
     double getAverageRssi() const {
-        return this->totalPacketsReceived > 0 ? (double)this->totalRssi / this->totalPacketsReceived : 0;
+        double sum = 0;
+        size_t count = min(rssiCount, NUM_SAMPLES);
+        for(size_t i = 0; i < count; i++) {
+            sum += rssiSamples[i];
+        }
+        return count > 0 ? sum / count : 0;
     }
 
     double getAverageSnr() const {
-        return this->totalPacketsReceived > 0 ? (double)this->totalSnr / this->totalPacketsReceived : 0;
+        double sum = 0;
+        size_t count = min(snrCount, NUM_SAMPLES);
+        for(size_t i = 0; i < count; i++) {
+            sum += snrSamples[i];
+        }
+        return count > 0 ? sum / count : 0;
     }
+
 
     void printStats() const {
         Serial.println("Reception Stats:");
@@ -99,8 +120,12 @@ public:
 private:
     uint32_t totalPacketsReceived;
     uint32_t totalBytesReceived;
-    int32_t totalRssi;
-    int32_t totalSnr;
+    int16_t rssiSamples[NUM_SAMPLES];
+    int8_t snrSamples[NUM_SAMPLES];
+    size_t rssiIndex;
+    size_t snrIndex;
+    size_t rssiCount;
+    size_t snrCount;
 };
 
 class DeviceInformation {
