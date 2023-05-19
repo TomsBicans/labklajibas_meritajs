@@ -3,6 +3,8 @@
 
 #include "BaseDevice.h"
 #include "PinDefinitions.h"
+#include "Measurement.h"
+#include "Logger.h"
 // Include necessary libraries for MonitoringDevice
 #include <DHT.h>
 #include <Adafruit_BMP085.h>

@@ -145,12 +145,24 @@ LogPacket logSensorReadings(Logger *logger, DeviceRole target, DeviceRole origin
   logData.count = 4;
   Serial.println("Logged sensor readings.");
   return logData;
-  // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD5, entry.atm_air_particle);
-  // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD6, entry.atm_air_smoke);
-  // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD7, entry.atm_CO2_ammount);
-  // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD8, entry.atm_sound_pressure);
-  // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD9, entry.light_intensity);
-  // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD10, entry.UV_intensity);
-  // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD11, entry.quality_rating);
-  // logger->log(x_id, target, origin, SENSOR_READINGS_FIELD12, static_cast<long int>(entry.user_likes));
+}
+
+
+void serializeLogPacket(DeviceState& state, LogPacket logPacket) {
+  memset(state.txpacket, 0, BUFFER_SIZE); // Clear the buffer
+  for (size_t i = 0; i < logPacket.count; i++) {
+    memcpy(state.txpacket + i * sizeof(LogEntry), &(logPacket.entries[i]), sizeof(LogEntry));
+  }
+  state.txpacket_size = logPacket.count * sizeof(LogEntry);
+}
+
+LogPacket deserializeLogPacket(DeviceState& state, size_t bufferSize) {
+  // Reads data from the state.rxpacket
+  size_t count = bufferSize / sizeof(LogEntry);
+  LogPacket logPacket;
+  logPacket.count = count;
+  for (size_t i = 0; i < count; i++) {
+    memcpy(&(logPacket.entries[i]), state.rxpacket + i * sizeof(LogEntry), sizeof(LogEntry));
+  }
+  return logPacket;
 }

@@ -56,10 +56,24 @@ void OnRxDoneAdministrator(uint8_t *payload, uint16_t size, int16_t rssi, int8_t
     memcpy(g_deviceState.rxpacket, payload, size );
     g_deviceState.rxpacket[size]='\0';
     Radio.Sleep( );
-    Serial.printf("\r\nreceived packet \"%s\" with rssi %d , length %d\r\n",g_deviceState.rxpacket,rssi,size);
     receiverStats.packetReceived(size, rssi, snr);
     displayReceiverStats(receiverStats);
     g_deviceState.loraIdle = true;
+
+    Serial.print("\r\nreceived packet \"");
+    for (size_t i = 0; i < size; i++) {
+        Serial.printf("%02X ", (uint8_t)g_deviceState.rxpacket[i]);
+    }
+    Serial.printf("\" with rssi %d , length %d\r\n", rssi, size);
+
+    // Do data processing.
+    LogPacket data = deserializeLogPacket(g_deviceState, size);
+    
+    // Print the log entries.
+    for (uint32_t i = 0; i < data.count; ++i) {
+      Serial.println(String("Log ") + i + ": " + data.entries[i].toString());
+      logger.write_log(data.entries[i]);
+    }
 }
 
 void test(){

@@ -1,7 +1,4 @@
-#include "BaseDevice.h"
 #include "MonitoringDevice.h"
-#include "Measurement.h"
-#include "Logger.h"
 
 DHT dht_sensor(DHT_PIN, DHT_TYPE);
 Adafruit_BMP085 bmp;
@@ -21,17 +18,39 @@ void setupMonitoringDevice(){
     // Other monitoring device-specific setup
 }
 
+
+float temperature = 15;
+float humidity = 80;
+float air_pressure = 1000;
+float altitude = 15;
+
 void loopMonitoringDevice(){
     // Implement loop logic for monitoring device
     if(g_deviceState.loraIdle == true)
     {
       delay(1000);
-      g_deviceState.txNumber += 0.01;
-      sprintf(g_deviceState.txpacket,"Hello world number %0.3f",g_deviceState.txNumber);  //start a package
-    
-      Serial.printf("\r\nsending packet \"%s\" , length %d\r\n",g_deviceState.txpacket, strlen(g_deviceState.txpacket));
+      // g_deviceState.txNumber += 0.01;
+      measurement::entry entry;
+      entry.atm_temperature = temperature;
+      entry.atm_air_pressure = air_pressure;
+      entry.atm_humidity = humidity;
+      entry.atm_altitude = altitude;
+      temperature+= 0.1;
+      humidity+=0.01;
+
+      LogPacket txdata = logSensorReadings(&logger, ADMINISTRATOR, MONITORING_DEVICE, entry);
+      serializeLogPacket(g_deviceState, txdata);
+
+      // size_t packetSize = txdata.count * sizeof(LogEntry);
+      
+      Serial.print("\r\nsending packet \"");
+      for (size_t i = 0; i < g_deviceState.txpacket_size; i++) {
+        Serial.printf("%02X ", (uint8_t)g_deviceState.txpacket[i]);
+      }
+      Serial.printf("\" , length %d\r\n", g_deviceState.txpacket_size);
+
       transmissionStats.startTransmission();
-      Radio.Send( (uint8_t *)g_deviceState.txpacket, strlen(g_deviceState.txpacket) ); //send the package out	
+      Radio.Send( (uint8_t *)g_deviceState.txpacket, g_deviceState.txpacket_size ); //send the package out	
       g_deviceState.loraIdle = false;
     }
 }
@@ -49,7 +68,7 @@ void OnTxDoneMonitoringDevice(){
     g_deviceState.loraIdle = true;
 
     //End the transmission and update the status.
-    transmissionStats.endTransmission(strlen(g_deviceState.txpacket));
+    transmissionStats.endTransmission(g_deviceState.txpacket_size);
     logTransmissionStats(&logger, ADMINISTRATOR, MONITORING_DEVICE, transmissionStats);
     displayTransmissionStats(transmissionStats);
 }

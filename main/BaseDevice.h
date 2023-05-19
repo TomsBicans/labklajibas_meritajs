@@ -73,5 +73,9 @@ LogPacket logDeviceState(      Logger *logger, DeviceRole target, DeviceRole ori
 LogPacket logTransmissionStats(Logger *logger, DeviceRole target, DeviceRole origin, const TransmissionStats stats);
 LogPacket logReceiverStats(    Logger *logger, DeviceRole target, DeviceRole origin, const ReceiverStats stats);
 LogPacket logDeviceInformation(Logger *logger, DeviceRole target, DeviceRole origin, const DeviceInformation info);
+LogPacket logSensorReadings(   Logger *logger, DeviceRole target, DeviceRole origin, const measurement::entry entry);
+
+void serializeLogPacket(DeviceState& state, LogPacket logPacket);
+LogPacket deserializeLogPacket(DeviceState& state, size_t bufferSize);
 
 #endif // BASE_DEVICE_H

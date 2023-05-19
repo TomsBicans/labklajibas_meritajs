@@ -101,11 +101,12 @@ class Logger {
     const char* logCountKey = "logcount";
     const char* namespaceString;
     const char* dataFileName;
-    void write_log(LogEntry entry);
+    
 
   public:
     Logger(const char* namespaceString, const char* dataFileName);
-
+    
+    void write_log(LogEntry entry);
     LogEntry log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, float numericValue);
     LogEntry log(uint32_t x_id, uint8_t targetDevice, uint8_t originDevice, SemanticValue semanticValue, long int numericValue);
     void clearLogs();

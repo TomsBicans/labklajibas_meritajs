@@ -152,7 +152,9 @@ public:
     }
 
     char txpacket[BUFFER_SIZE];
+    size_t txpacket_size;
     char rxpacket[BUFFER_SIZE];
+    size_t rxpacket_size;
     double txNumber;
     bool loraIdle;
 
