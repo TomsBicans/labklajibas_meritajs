@@ -1,6 +1,7 @@
 #include "MonitoringDevice.h"
 
 DHT dht_sensor(DHT_PIN, DHT_TYPE);
+// DHTesp dht_sensor;
 Adafruit_BMP085 bmp;
 
 
@@ -9,34 +10,44 @@ void setupMonitoringDevice(){
 
     // Initialize sensors specific to monitoring device
     Serial.println("Initializing sensors.");
+    // dht_sensor.setup(DHT_PIN, DHTesp::DHT22);
     dht_sensor.begin();
     if (!bmp.begin()) {
-        Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+      Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+      // while (1);
+    }else{
+      Serial.println("Found a valid BMP085 sensor");
     }
-    // pinMode(NOISE_PIN, INPUT);
-    // pinMode(AIR_QUAL_PIN, INPUT);
-    // Other monitoring device-specific setup
 }
 
 
-float temperature = 15;
-float humidity = 80;
-float air_pressure = 1000;
-float altitude = 15;
+// float temperature = 15;
+// float humidity = 80;
+// float air_pressure = 1000;
+// float altitude = 15;
 
 void loopMonitoringDevice(){
     // Implement loop logic for monitoring device
     if(g_deviceState.loraIdle == true)
     {
-      delay(1000);
+      delay(2000);
       // g_deviceState.txNumber += 0.01;
       measurement::entry entry;
-      entry.atm_temperature = temperature;
-      entry.atm_air_pressure = air_pressure;
-      entry.atm_humidity = humidity;
-      entry.atm_altitude = altitude;
-      temperature+= 0.1;
-      humidity+=0.01;
+      // entry.atm_temperature = dht_sensor.getTemperature();
+      entry.atm_temperature = dht_sensor.readTemperature();
+      delay(250);
+      // entry.atm_air_pressure = sensors::atm_air_pressure(bmp);
+      // delay(200);
+      // entry.atm_humidity = dht_sensor.getHumidity();
+      entry.atm_humidity = dht_sensor.readHumidity();
+      delay(250);
+      // entry.atm_altitude = sensors::atm_altitude(bmp);
+      // delay(200);
+      // temperature+= 0.1;
+      // humidity+=0.01;
+
+      Serial.println(entry.atm_humidity);
+      Serial.println(entry.atm_temperature);
 
       LogPacket txdata = logSensorReadings(&logger, ADMINISTRATOR, MONITORING_DEVICE, entry);
       serializeLogPacket(g_deviceState, txdata);

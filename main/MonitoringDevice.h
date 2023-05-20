@@ -5,8 +5,10 @@
 #include "PinDefinitions.h"
 #include "Measurement.h"
 #include "Logger.h"
+#include "Sensors.h"
 // Include necessary libraries for MonitoringDevice
 #include <DHT.h>
+// #include "DHTesp.h"
 #include <Adafruit_BMP085.h>
 
 extern DHT dht_sensor;
