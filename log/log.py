@@ -5,17 +5,16 @@ import threading
 import time
 import os.path as path
 
-LOG_FILE = path.join(path.dirname(__file__), "running_logs.log")
+LOG_FILE = path.join(path.dirname(__file__), "running_logs_test.log")
 
 
 def monitor(comport: str, baudrate: int):
-
     ser = serial.Serial(comport, baudrate, timeout=0)
 
-    while (1):
+    while 1:
         line = ser.readline()
         # print(line, type(line))
-        if (line != b''):
+        if line != b"":
             # line = line.decode("ascii")
             line = line.decode()
             print(line)
@@ -40,6 +39,6 @@ def monitor(comport: str, baudrate: int):
 
 if __name__ == "__main__":
     print("Start Serial Monitor")
-    COMPORT = "COM9"
-    BAUDRATE = 9600
+    COMPORT = "COM6"
+    BAUDRATE = 115200
     monitor(COMPORT, BAUDRATE)
