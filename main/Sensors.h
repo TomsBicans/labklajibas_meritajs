@@ -10,6 +10,7 @@ float UV_intensity(int pin = UV_INTENSITY_PIN);
 float light_intensity(int pin = LIGHT_INTENSITY_PIN);
 float atm_CO2_ammount(int pin = CO2_AMMOUNT_PIN);
 float atm_air_pressure(Adafruit_BMP085 &sensor);
+float atm_altitude(Adafruit_BMP085 &sensor);
 float atm_smoke_ammount(int pin = SMOKE_AMMOUNT_PIN);
 float atm_sound_pressure(int pin = SOUND_PRESSURE_PIN);
 

@@ -57,10 +57,13 @@ namespace sensors{
     return res/count;
     }
   float atm_air_pressure(Adafruit_BMP085 &sensor){
-    /*TODO: implement */
     float res = sensor.readPressure();
     res = res / 1000; // Pa -> kPa
     return res;
+    }
+
+  float atm_altitude(Adafruit_BMP085 &sensor){
+    return sensor.readAltitude();
     }
   float atm_smoke_ammount(int pin){
     /*TODO: implement */
