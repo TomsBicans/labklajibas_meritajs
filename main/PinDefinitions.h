@@ -3,17 +3,17 @@
 
 #include <DHT.h>
 
-#define USER_INPUT_PIN_1 3
-#define USER_INPUT_PIN_2 5
-#define SD_CS_PIN 49
-#define NOISE_PIN 6
-#define DHT_PIN 2
+#define DHT_PIN 48
 #define DHT_TYPE DHT22
-#define AIR_QUAL_PIN 8
-#define BUZZER_PIN 9
-#define CO2_PWM_PIN 10
-#define NOISE_SENSOR_A_PIN 0
 
+#define USER_INPUT_PIN_1 -1
+#define USER_INPUT_PIN_2 -1
+#define SD_CS_PIN -1
+#define NOISE_PIN -1
+#define AIR_QUAL_PIN -1
+#define BUZZER_PIN -1
+#define CO2_PWM_PIN -1
+#define NOISE_SENSOR_A_PIN -1
 
 #define UV_INTENSITY_PIN -1
 #define LIGHT_INTENSITY_PIN -1
