@@ -67,11 +67,12 @@ union NumericValue {
 struct LogEntry {
   uint8_t targetDevice;
   uint8_t originDevice;
-  uint32_t x_id;
   SemanticValue semanticValue;
+  bool isFloat;
+  uint32_t x_id;
   unsigned long timestamp;
   NumericValue numericValue;
-  bool isFloat;
+  
 
   String toString() const {
     char buffer[512]; // Adjust the buffer size according to your needs
