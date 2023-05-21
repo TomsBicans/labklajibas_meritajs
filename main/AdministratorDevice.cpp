@@ -57,6 +57,7 @@ void OnRxDoneAdministrator(uint8_t *payload, uint16_t size, int16_t rssi, int8_t
     g_deviceState.rxpacket[size]='\0';
     Radio.Sleep( );
     receiverStats.packetReceived(size, rssi, snr);
+    logReceiverStats(&logger, ADMINISTRATOR, ADMINISTRATOR, receiverStats);
     displayReceiverStats(receiverStats);
     g_deviceState.loraIdle = true;
 
