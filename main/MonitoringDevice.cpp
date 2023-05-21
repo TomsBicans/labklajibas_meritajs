@@ -36,18 +36,26 @@ void loopMonitoringDevice(){
       // entry.atm_temperature = dht_sensor.getTemperature();
       entry.atm_temperature = dht_sensor.readTemperature();
       delay(250);
-      // entry.atm_air_pressure = sensors::atm_air_pressure(bmp);
-      // delay(200);
-      // entry.atm_humidity = dht_sensor.getHumidity();
+      entry.atm_air_pressure = sensors::atm_air_pressure(bmp);
+      delay(200);
       entry.atm_humidity = dht_sensor.readHumidity();
       delay(250);
-      // entry.atm_altitude = sensors::atm_altitude(bmp);
-      // delay(200);
+      entry.atm_altitude = sensors::atm_altitude(bmp);
+      delay(200);
       // temperature+= 0.1;
       // humidity+=0.01;
 
+      Serial.print("air pressure (kPa): ");
+      Serial.println(entry.atm_air_pressure);
+
+      Serial.print("humidity (%): ");
       Serial.println(entry.atm_humidity);
+
+      Serial.print("temperature (*C):");
       Serial.println(entry.atm_temperature);
+
+      Serial.print("Altitude (m): ");
+      Serial.println(entry.atm_altitude);
 
       LogPacket txdata = logSensorReadings(&logger, ADMINISTRATOR, MONITORING_DEVICE, entry);
       serializeLogPacket(g_deviceState, txdata);

@@ -15,6 +15,7 @@ void setupBase(){
     long int start = millis();
     // Initialize system
     util::init_serial(115200);
+    Wire.begin();
     g_deviceState.factory_display.init();
     g_deviceState.factory_display.setFont(ArialMT_Plain_10);
     WiFi.mode(WIFI_OFF);

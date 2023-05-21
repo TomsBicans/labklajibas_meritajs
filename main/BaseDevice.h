@@ -7,13 +7,14 @@
 #include "LoRaWan_APP.h"
 #include "DeviceStats.h"
 #include "Logger.h"
+#include <Wire.h>
 
 #include "util.h"
 #include "print.h"
 #include "Measurement.h"
 
-#define RF_FREQUENCY                                915000000 // Hz
-#define TX_OUTPUT_POWER                             5        // dBm
+#define RF_FREQUENCY                                868000000 // Hz
+#define TX_OUTPUT_POWER                             14        // dBm
 #define LORA_BANDWIDTH                              0         // [0: 125 kHz,
                                                               //  1: 250 kHz,
                                                               //  2: 500 kHz,
