@@ -68,6 +68,7 @@ void setupLoRaWAN(
 // Utility functions
 void displayTransmissionStats(const TransmissionStats &st);
 void displayReceiverStats(const ReceiverStats &st);
+void displayDeviceInfoLogger();
 
 // Logger functions
 LogPacket logDeviceState(      Logger *logger, DeviceRole target, DeviceRole origin, const DeviceState state);

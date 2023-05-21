@@ -7,7 +7,7 @@ Adafruit_BMP085 bmp;
 
 void setupMonitoringDevice(){
     configureRadioForTx();
-
+    Wire.begin();
     // Initialize sensors specific to monitoring device
     Serial.println("Initializing sensors.");
     // dht_sensor.setup(DHT_PIN, DHTesp::DHT22);

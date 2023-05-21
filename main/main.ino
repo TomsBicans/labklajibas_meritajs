@@ -59,6 +59,7 @@ void setup()
       device.OnRxDoneFunc
     );
     if (deviceRole == LOG_PRINTER){
+      displayDeviceInfoLogger();
       logger.printLogs();
       if (purgeNVS){
         Serial.println("Deleting all logger storage.");

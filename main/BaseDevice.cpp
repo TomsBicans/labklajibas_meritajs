@@ -15,7 +15,6 @@ void setupBase(){
     long int start = millis();
     // Initialize system
     util::init_serial(115200);
-    Wire.begin();
     g_deviceState.factory_display.init();
     g_deviceState.factory_display.setFont(ArialMT_Plain_10);
     WiFi.mode(WIFI_OFF);
@@ -93,6 +92,15 @@ void displayReceiverStats(const ReceiverStats &st){
     g_deviceState.factory_display.drawString(0, 24, stats);
     sprintf(stats, "Average SNR: %.2f", st.getAverageSnr());
     g_deviceState.factory_display.drawString(0, 36, stats);
+    g_deviceState.factory_display.display();
+}
+
+void displayDeviceInfoLogger()
+{
+    // Display device information on the screen.
+    g_deviceState.factory_display.clear();
+    g_deviceState.factory_display.setFont(ArialMT_Plain_10);
+    g_deviceState.factory_display.drawString(0, 0, "Log printer mode");
     g_deviceState.factory_display.display();
 }
 
