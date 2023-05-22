@@ -5,17 +5,29 @@ DHT dht_sensor(DHT_PIN, DHT_TYPE);
 Adafruit_BMP085 bmp;
 
 
+int bmpRetryCount = 5;
 void setupMonitoringDevice(){
     configureRadioForTx();
+    delay(1000);
     Wire.begin();
     // Initialize sensors specific to monitoring device
     Serial.println("Initializing sensors.");
     // dht_sensor.setup(DHT_PIN, DHTesp::DHT22);
+    delay(1000);
     dht_sensor.begin();
-    if (!bmp.begin()) {
-      Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-      // while (1);
-    }else{
+    // Try to initialize BMP085 sensor in a loop until successful    
+    while (!bmp.begin()) {
+      bmpRetryCount--;
+      Serial.println("Could not find a valid BMP085 sensor, retrying...");
+      delay(1000); // Wait a bit before retrying
+      if (bmpRetryCount < 0){
+        break;
+      }
+    }
+    if (bmpRetryCount < 0){
+      Serial.println("Did not find a valid BMP085 sensor");
+    }
+    else{
       Serial.println("Found a valid BMP085 sensor");
     }
 }
@@ -36,12 +48,17 @@ void loopMonitoringDevice(){
       // entry.atm_temperature = dht_sensor.getTemperature();
       entry.atm_temperature = dht_sensor.readTemperature();
       delay(250);
-      entry.atm_air_pressure = sensors::atm_air_pressure(bmp);
-      delay(200);
+
       entry.atm_humidity = dht_sensor.readHumidity();
       delay(250);
-      entry.atm_altitude = sensors::atm_altitude(bmp);
-      delay(200);
+
+      if (bmpRetryCount > 0){
+        entry.atm_air_pressure = sensors::atm_air_pressure(bmp);
+        delay(200);
+        entry.atm_altitude = sensors::atm_altitude(bmp);
+        delay(200);
+      }
+
       // temperature+= 0.1;
       // humidity+=0.01;
 
