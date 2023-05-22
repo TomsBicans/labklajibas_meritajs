@@ -115,10 +115,10 @@ LogPacket logDeviceState(Logger *logger, DeviceRole target, DeviceRole origin, c
 LogPacket logTransmissionStats(Logger *logger, DeviceRole target, DeviceRole origin, const TransmissionStats stats) {
   LogPacket logData;
   uint32_t x_id = millis();
-  logData.entries[0] = logger->log(x_id, target, origin, TRANSMISSION_STATS_FIELD1, static_cast<long int>(stats.getPacketsSent()));
-  logData.entries[1] = logger->log(x_id, target, origin, TRANSMISSION_STATS_FIELD2, static_cast<long int>(stats.getAveragePacketSendingTime()));
-  logData.entries[2] = logger->log(x_id, target, origin, TRANSMISSION_STATS_FIELD3, static_cast<long int>(stats.getTotalBytesSent()));
-  logData.entries[3] = logger->log(x_id, target, origin, TRANSMISSION_STATS_FIELD4, static_cast<long int>(stats.getTotalOnAirTime()));
+  logData.entries[0] = logger->log(x_id, target, origin, TRANMISSION_PACKETS_SENT, static_cast<long int>(stats.getPacketsSent()));
+  logData.entries[1] = logger->log(x_id, target, origin, TRANSMISSION_AVERAGE_SENDING_TIME, static_cast<long int>(stats.getAveragePacketSendingTime()));
+  logData.entries[2] = logger->log(x_id, target, origin, TRANSMISSION_TOTAL_BYTES_SENT, static_cast<long int>(stats.getTotalBytesSent()));
+  logData.entries[3] = logger->log(x_id, target, origin, TRANSMISSION_TOTAL_ON_AIR_TIME, static_cast<long int>(stats.getTotalOnAirTime()));
   logData.count = 4;
   Serial.println("Wrote stats to logger.");
   return logData;
@@ -127,10 +127,10 @@ LogPacket logTransmissionStats(Logger *logger, DeviceRole target, DeviceRole ori
 LogPacket logReceiverStats(Logger *logger, DeviceRole target, DeviceRole origin, const ReceiverStats stats) {
   LogPacket logData;
   uint32_t x_id = millis();
-  logData.entries[0] = logger->log(x_id, target, origin, RECEIVER_STATS_FIELD1, static_cast<long int>(stats.getPacketsReceived()));
-  logData.entries[1] = logger->log(x_id, target, origin, RECEIVER_STATS_FIELD2, static_cast<long int>(stats.getTotalBytesReceived()));
-  logData.entries[2] = logger->log(x_id, target, origin, RECEIVER_STATS_FIELD3, static_cast<float>(stats.getAverageRssi()));
-  logData.entries[3] = logger->log(x_id, target, origin, RECEIVER_STATS_FIELD4, static_cast<float>(stats.getAverageSnr()));
+  logData.entries[0] = logger->log(x_id, target, origin, RECEIVER_TOTAL_PACKETS_RECEIVED, static_cast<long int>(stats.getPacketsReceived()));
+  logData.entries[1] = logger->log(x_id, target, origin, RECEIVER_TOTAL_BYTES_RECEIVED, static_cast<long int>(stats.getTotalBytesReceived()));
+  logData.entries[2] = logger->log(x_id, target, origin, RECEIVER_AVERAGE_RSSI, static_cast<float>(stats.getAverageRssi()));
+  logData.entries[3] = logger->log(x_id, target, origin, RECEIVER_AVERAGE_SNR, static_cast<float>(stats.getAverageSnr()));
   logData.count = 4;
   return logData;
 }
