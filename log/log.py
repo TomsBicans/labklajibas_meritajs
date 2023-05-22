@@ -1,44 +1,69 @@
-import sys
 import os
 import serial
-import threading
 import time
 import os.path as path
+import argparse
+from datetime import datetime
 
-LOG_FILE = path.join(path.dirname(__file__), "running_logs_test.log")
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Serial port monitor.")
+    parser.add_argument(
+        "-p",
+        "--port",
+        type=str,
+        help="The COM port to monitor.",
+        default="COM6",
+    )
+    parser.add_argument(
+        "-b",
+        "--baudrate",
+        type=int,
+        help="The baudrate for the COM port.",
+        default=115200,
+    )
+    return parser.parse_args()
 
 
-def monitor(comport: str, baudrate: int):
-    ser = serial.Serial(comport, baudrate, timeout=0)
+def generate_log_file() -> str:
+    timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    return path.join(path.dirname(__file__), f"logs_{timestamp}.log")
 
-    while 1:
-        line = ser.readline()
-        # print(line, type(line))
-        if line != b"":
-            # line = line.decode("ascii")
-            line = line.decode()
-            print(line)
-            # print line[:-1]         # strip \n
-            # fields = line[:-1].split('; ')
 
-            # ID = fields[0]
-            # TIME = int(fields[1])
-            # print fields
-            # print("device ID: ", ID)
-            # write to file
-            text_file = open(LOG_FILE, "a")
-            # line = str(TIME) + ": " + str(CT) + "\n"
-            text_file.write(line)
-            text_file.close()
-        time.sleep(0.01)
-
-        # do some other things here
-
-    print("Stop Monitoring")
+def monitor(comport: str, baudrate: int, log_file: str):
+    ser = None
+    try:
+        while 1:
+            try:
+                ser = serial.Serial(comport, baudrate, timeout=0)
+                while 1:
+                    line = ser.readline()
+                    if line != b"":
+                        line = line.decode()
+                        print(line)
+                        # get time to milliseconds
+                        timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+                        with open(log_file, "a") as f:
+                            f.write(f"{timestamp} {line}")
+                    time.sleep(0.01)
+            except serial.SerialException as e:
+                print(f"Failed to open serial port: {e}")
+                print("Retrying in 300ms...")
+                time.sleep(0.3)
+            except KeyboardInterrupt:
+                print("Interrupted by user")
+                break
+    finally:
+        if ser is not None:
+            ser.close()
+            print("Serial port closed")
+        print("Stop Monitoring")
 
 
 if __name__ == "__main__":
     print("Start Serial Monitor")
-    COMPORT = "COM6"
-    BAUDRATE = 115200
-    monitor(COMPORT, BAUDRATE)
+    args = parse_arguments()
+    comport = args.port if args.port else "COM6"
+    baudrate = args.baudrate if args.baudrate else 115200
+    log_file = generate_log_file()
+    monitor(comport, baudrate, log_file)
