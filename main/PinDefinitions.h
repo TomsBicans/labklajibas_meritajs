@@ -6,6 +6,9 @@
 #define DHT_PIN 48
 #define DHT_TYPE DHT22
 
+#define BMP_SDA 42
+#define BMP_SCL 41
+
 #define USER_INPUT_PIN_1 -1
 #define USER_INPUT_PIN_2 -1
 #define SD_CS_PIN -1
