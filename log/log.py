@@ -25,9 +25,11 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def generate_log_file() -> str:
+def generate_log_file(comport: str, baudrate: int) -> str:
     timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-    return path.join(path.dirname(__file__), f"logs_{timestamp}.log")
+    return path.join(
+        path.dirname(__file__), f"logs_{comport}_{baudrate}_{timestamp}.log"
+    )
 
 
 def monitor(comport: str, baudrate: int, log_file: str):
@@ -35,7 +37,7 @@ def monitor(comport: str, baudrate: int, log_file: str):
     try:
         while 1:
             try:
-                ser = serial.Serial(comport, baudrate, timeout=0)
+                ser = serial.Serial(comport, baudrate, timeout=0.3)
                 while 1:
                     line = ser.readline()
                     if line != b"":
@@ -65,5 +67,5 @@ if __name__ == "__main__":
     args = parse_arguments()
     comport = args.port if args.port else "COM6"
     baudrate = args.baudrate if args.baudrate else 115200
-    log_file = generate_log_file()
+    log_file = generate_log_file(comport, baudrate)
     monitor(comport, baudrate, log_file)
