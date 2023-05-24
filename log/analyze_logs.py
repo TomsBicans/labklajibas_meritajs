@@ -5,6 +5,7 @@ import argparse
 import os.path as path
 import os
 import sys
+import numpy as np
 
 SemanticValue = {
     # Sensor readings
@@ -87,6 +88,10 @@ def main(logfile: str):
 
     # Convert the list into a DataFrame
     df = pd.DataFrame(log_data)
+
+    # Shift time so it starts at 0
+    df["Timestamp"] -= df["Timestamp"].min()
+
     # Get unique Semantic Values
     unique_semantic_values = df["Semantic Value"].unique()
 
@@ -131,9 +136,17 @@ def main(logfile: str):
             xytext=(-10, 10),
             ha="center",
         )
+        # Here we adjust the xticks
+        ax.set_xticks(
+            np.arange(
+                min(semantic_df["Timestamp"]), max(semantic_df["Timestamp"]) + 1, 100
+            )
+        )
+
         role = determine_role(logfile)
         ax.set_title(
             f"({role}) Numeric Value by Timestamp for {number_to_field_name(semantic_value)}"
+            f" - {len(semantic_df)} samples"
         )
         ax.set_xlabel("Timestamp (seconds)")
         ax.set_ylabel("Numeric Value")
