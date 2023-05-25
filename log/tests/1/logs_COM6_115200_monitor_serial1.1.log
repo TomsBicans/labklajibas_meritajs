@@ -1,0 +1,456 @@
+20:59:24.435 ESP-ROM:esp32s3-20210327
+20:59:24.457 Build:Mar 27 2021
+20:59:24.473 rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+20:59:24.488 SPIWP:0xee
+20:59:24.504 mode:DIO, clock div:1
+20:59:24.519 load:0x3fce3808,len:0x43c
+20:59:24.534 load:0x403c9700,len:0xbec
+20:59:24.550 load:0x403cc700,len:0x2a3c
+20:59:24.565 SHA-256 comparison failed:
+20:59:24.582 Calculated: dcde8d8a4817d9bf5d5d69a7247667264e4e10ac7493514868b61f5aa6146539
+20:59:24.598 Expected: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+20:59:24.613 Attempting to boot anyway...
+20:59:24.628 entry 0x403c98d8
+20:59:24.971 Start
+20:59:25.000 Total loop time: 332 milliseconds
+20:59:25.301 Initializing LORAWAN setup.
+20:59:25.482 LORAWAN setup complete.
+20:59:25.501 Changed radio mode to transmitter
+20:59:25.516 Changed radio mode to transmitter
+20:59:26.490 Initializing sensors.
+20:59:27.493 Could not find a valid BMP085 sensor, retrying...
+20:59:28.495 Could not find a valid BMP085 sensor, retrying...
+20:59:29.495 Could not find a valid BMP085 sensor, retrying...
+20:59:30.496 Could not find a valid BMP085 sensor, retrying...
+20:59:31.498 Could not find a valid BMP085 sensor, retrying...
+20:59:32.499 Could not find a valid BMP085 sensor, retrying...
+20:59:33.498 Did not find a valid BMP085 sensor
+20:59:36.008 air pressure (kPa): 0.00
+20:59:36.023 humidity (%): 41.00
+20:59:36.039 temperature (*C):23.90
+20:59:36.054 Altitude (m): 0.00
+20:59:36.086 0 log entries found.
+20:59:36.187 16 bytes written for log entry.
+20:59:36.273 4 bytes written.logcount update successful.
+20:59:36.286 1 log entries found.
+20:59:36.303 16 bytes written for log entry.
+20:59:36.317 4 bytes written.logcount update successful.
+20:59:36.331 2 log entries found.
+20:59:36.348 16 bytes written for log entry.
+20:59:36.363 4 bytes written.logcount update successful.
+20:59:36.377 3 log entries found.
+20:59:36.394 16 bytes written for log entry.
+20:59:36.410 4 bytes written.logcount update successful.
+20:59:36.424 Logged sensor readings.
+20:59:36.439 
+20:59:36.457 sending packet "00 01 AB 01 36 2D 00 00 36 2D 00 00 33 33 BF 41 00 01 AC 01 36 2D 00 00 3C 2E 00 00 00 00 24 42 00 01 AD 01 36 2D 00 00 49 2E 00 00 00 00 00 00 00 01 AE 01 36 2D 00 00 4E 2E 00 00 00 00 00 00 " , length 64
+20:59:36.471 TX done......
+20:59:36.486 4 log entries found.
+20:59:36.501 16 bytes written for log entry.
+20:59:36.518 4 bytes written.logcount update successful.
+20:59:36.533 5 log entries found.
+20:59:36.548 16 bytes written for log entry.
+20:59:36.564 4 bytes written.logcount update successful.
+20:59:36.579 6 log entries found.
+20:59:36.596 16 bytes written for log entry.
+20:59:36.611 4 bytes written.logcount update successful.
+20:59:36.627 7 log entries found.
+20:59:36.642 16 bytes written for log entry.
+20:59:36.656 4 bytes written.logcount update successful.
+20:59:36.672 Wrote stats to logger.
+20:59:39.094 air pressure (kPa): 0.00
+20:59:39.117 humidity (%): 40.40
+20:59:39.132 temperature (*C):23.90
+20:59:39.148 Altitude (m): 0.00
+20:59:39.164 8 log entries found.
+20:59:39.178 16 bytes written for log entry.
+20:59:39.194 4 bytes written.logcount update successful.
+20:59:39.209 9 log entries found.
+20:59:39.225 16 bytes written for log entry.
+20:59:39.241 4 bytes written.logcount update successful.
+20:59:39.256 10 log entries found.
+20:59:39.272 16 bytes written for log entry.
+20:59:39.288 4 bytes written.logcount update successful.
+20:59:39.303 11 log entries found.
+20:59:39.318 16 bytes written for log entry.
+20:59:39.334 4 bytes written.logcount update successful.
+20:59:39.349 Logged sensor readings.
+20:59:39.365 
+20:59:39.384 sending packet "00 01 AB 01 42 39 00 00 42 39 00 00 33 33 BF 41 00 01 AC 01 42 39 00 00 4B 39 00 00 9A 99 21 42 00 01 AD 01 42 39 00 00 5A 39 00 00 00 00 00 00 00 01 AE 01 42 39 00 00 61 39 00 00 00 00 00 00 " , length 64
+20:59:39.396 TX done......
+20:59:39.412 12 log entries found.
+20:59:39.427 16 bytes written for log entry.
+20:59:39.442 4 bytes written.logcount update successful.
+20:59:39.458 13 log entries found.
+20:59:39.473 16 bytes written for log entry.
+20:59:39.489 4 bytes written.logcount update successful.
+20:59:39.505 14 log entries found.
+20:59:39.521 16 bytes written for log entry.
+20:59:39.535 4 bytes written.logcount update successful.
+20:59:39.551 15 log entries found.
+20:59:39.567 16 bytes written for log entry.
+20:59:39.583 4 bytes written.logcount update successful.
+20:59:39.599 Wrote stats to logger.
+20:59:41.838 air pressure (kPa): 0.00
+20:59:41.861 humidity (%): 40.70
+20:59:41.878 temperature (*C):23.90
+20:59:41.892 Altitude (m): 0.00
+20:59:41.908 16 log entries found.
+20:59:41.923 16 bytes written for log entry.
+20:59:41.938 4 bytes written.logcount update successful.
+20:59:41.952 17 log entries found.
+20:59:41.969 16 bytes written for log entry.
+20:59:41.985 4 bytes written.logcount update successful.
+20:59:41.999 18 log entries found.
+20:59:42.015 16 bytes written for log entry.
+20:59:42.030 4 bytes written.logcount update successful.
+20:59:42.046 19 log entries found.
+20:59:42.061 16 bytes written for log entry.
+20:59:42.076 4 bytes written.logcount update successful.
+20:59:42.090 Logged sensor readings.
+20:59:42.106 
+20:59:42.125 sending packet "00 01 AB 01 FB 43 00 00 FB 43 00 00 33 33 BF 41 00 01 AC 01 FB 43 00 00 02 44 00 00 CD CC 22 42 00 01 AD 01 FB 43 00 00 13 44 00 00 00 00 00 00 00 01 AE 01 FB 43 00 00 18 44 00 00 00 00 00 00 " , length 64
+20:59:42.139 TX done......
+20:59:42.154 20 log entries found.
+20:59:42.169 16 bytes written for log entry.
+20:59:42.185 4 bytes written.logcount update successful.
+20:59:42.201 21 log entries found.
+20:59:42.216 16 bytes written for log entry.
+20:59:42.232 4 bytes written.logcount update successful.
+20:59:42.246 22 log entries found.
+20:59:42.263 16 bytes written for log entry.
+20:59:42.278 4 bytes written.logcount update successful.
+20:59:42.293 23 log entries found.
+20:59:42.308 16 bytes written for log entry.
+20:59:42.324 4 bytes written.logcount update successful.
+20:59:42.339 Wrote stats to logger.
+20:59:44.661 air pressure (kPa): 0.00
+20:59:44.680 humidity (%): 40.90
+20:59:44.696 temperature (*C):23.90
+20:59:44.711 Altitude (m): 0.00
+20:59:44.727 24 log entries found.
+20:59:44.743 16 bytes written for log entry.
+20:59:44.758 4 bytes written.logcount update successful.
+20:59:44.773 25 log entries found.
+20:59:44.789 16 bytes written for log entry.
+20:59:44.804 4 bytes written.logcount update successful.
+20:59:44.819 26 log entries found.
+20:59:44.835 16 bytes written for log entry.
+20:59:44.850 4 bytes written.logcount update successful.
+20:59:44.867 27 log entries found.
+20:59:44.883 16 bytes written for log entry.
+20:59:44.898 4 bytes written.logcount update successful.
+20:59:44.913 Logged sensor readings.
+20:59:44.928 
+20:59:44.947 sending packet "00 01 AB 01 02 4F 00 00 02 4F 00 00 33 33 BF 41 00 01 AC 01 02 4F 00 00 09 4F 00 00 9A 99 23 42 00 01 AD 01 02 4F 00 00 1A 4F 00 00 00 00 00 00 00 01 AE 01 02 4F 00 00 1F 4F 00 00 00 00 00 00 " , length 64
+20:59:44.960 TX done......
+20:59:44.977 28 log entries found.
+20:59:44.993 16 bytes written for log entry.
+20:59:45.008 4 bytes written.logcount update successful.
+20:59:45.024 29 log entries found.
+20:59:45.039 16 bytes written for log entry.
+20:59:45.055 4 bytes written.logcount update successful.
+20:59:45.069 30 log entries found.
+20:59:45.086 16 bytes written for log entry.
+20:59:45.101 4 bytes written.logcount update successful.
+20:59:45.117 31 log entries found.
+20:59:45.132 16 bytes written for log entry.
+20:59:45.148 4 bytes written.logcount update successful.
+20:59:45.163 Wrote stats to logger.
+20:59:47.480 air pressure (kPa): 0.00
+20:59:47.491 humidity (%): 41.10
+20:59:47.506 temperature (*C):23.90
+20:59:47.523 Altitude (m): 0.00
+20:59:47.537 32 log entries found.
+20:59:47.554 16 bytes written for log entry.
+20:59:47.570 4 bytes written.logcount update successful.
+20:59:47.585 33 log entries found.
+20:59:47.601 16 bytes written for log entry.
+20:59:47.617 4 bytes written.logcount update successful.
+20:59:47.631 34 log entries found.
+20:59:47.647 16 bytes written for log entry.
+20:59:47.662 4 bytes written.logcount update successful.
+20:59:47.678 35 log entries found.
+20:59:47.692 16 bytes written for log entry.
+20:59:47.708 4 bytes written.logcount update successful.
+20:59:47.724 Logged sensor readings.
+20:59:47.738 
+20:59:47.758 sending packet "00 01 AB 01 05 5A 00 00 05 5A 00 00 33 33 BF 41 00 01 AC 01 05 5A 00 00 0C 5A 00 00 66 66 24 42 00 01 AD 01 05 5A 00 00 1D 5A 00 00 00 00 00 00 00 01 AE 01 05 5A 00 00 6E 5A 00 00 00 00 00 00 " , length 64
+20:59:47.768 TX done......
+20:59:47.785 36 log entries found.
+20:59:47.800 16 bytes written for log entry.
+20:59:47.816 4 bytes written.logcount update successful.
+20:59:47.845 37 log entries found.
+20:59:47.861 16 bytes written for log entry.
+20:59:47.876 4 bytes written.logcount update successful.
+20:59:47.892 38 log entries found.
+20:59:47.907 16 bytes written for log entry.
+20:59:47.922 4 bytes written.logcount update successful.
+20:59:47.937 39 log entries found.
+20:59:47.953 16 bytes written for log entry.
+20:59:47.968 4 bytes written.logcount update successful.
+20:59:47.983 Wrote stats to logger.
+20:59:50.292 air pressure (kPa): 0.00
+20:59:50.310 humidity (%): 41.40
+20:59:50.324 temperature (*C):23.90
+20:59:50.341 Altitude (m): 0.00
+20:59:50.356 40 log entries found.
+20:59:50.373 16 bytes written for log entry.
+20:59:50.389 4 bytes written.logcount update successful.
+20:59:50.404 41 log entries found.
+20:59:50.419 16 bytes written for log entry.
+20:59:50.435 4 bytes written.logcount update successful.
+20:59:50.450 42 log entries found.
+20:59:50.466 16 bytes written for log entry.
+20:59:50.481 4 bytes written.logcount update successful.
+20:59:50.496 43 log entries found.
+20:59:50.511 16 bytes written for log entry.
+20:59:50.527 4 bytes written.logcount update successful.
+20:59:50.543 Logged sensor readings.
+20:59:50.557 
+20:59:50.575 sending packet "00 01 AB 01 00 65 00 00 00 65 00 00 33 33 BF 41 00 01 AC 01 00 65 00 00 07 65 00 00 9A 99 25 42 00 01 AD 01 00 65 00 00 18 65 00 00 00 00 00 00 00 01 AE 01 00 65 00 00 70 65 00 00 00 00 00 00 " , length 64
+20:59:50.589 TX done......
+20:59:50.606 44 log entries found.
+20:59:50.621 16 bytes written for log entry.
+20:59:50.636 4 bytes written.logcount update successful.
+20:59:50.651 45 log entries found.
+20:59:50.667 16 bytes written for log entry.
+20:59:50.682 4 bytes written.logcount update successful.
+20:59:50.697 46 log entries found.
+20:59:50.714 16 bytes written for log entry.
+20:59:50.728 4 bytes written.logcount update successful.
+20:59:50.745 47 log entries found.
+20:59:50.760 16 bytes written for log entry.
+20:59:50.776 4 bytes written.logcount update successful.
+20:59:50.790 Wrote stats to logger.
+20:59:53.110 air pressure (kPa): 0.00
+20:59:53.124 humidity (%): 41.40
+20:59:53.140 temperature (*C):23.90
+20:59:53.155 Altitude (m): 0.00
+20:59:53.171 48 log entries found.
+20:59:53.187 16 bytes written for log entry.
+20:59:53.203 4 bytes written.logcount update successful.
+20:59:53.219 49 log entries found.
+20:59:53.235 16 bytes written for log entry.
+20:59:53.252 4 bytes written.logcount update successful.
+20:59:53.269 50 log entries found.
+20:59:53.283 16 bytes written for log entry.
+20:59:53.298 4 bytes written.logcount update successful.
+20:59:53.314 51 log entries found.
+20:59:53.330 16 bytes written for log entry.
+20:59:53.346 4 bytes written.logcount update successful.
+20:59:53.359 Logged sensor readings.
+20:59:53.375 
+20:59:53.393 sending packet "00 01 AB 01 03 70 00 00 03 70 00 00 33 33 BF 41 00 01 AC 01 03 70 00 00 0A 70 00 00 9A 99 25 42 00 01 AD 01 03 70 00 00 6D 70 00 00 00 00 00 00 00 01 AE 01 03 70 00 00 72 70 00 00 00 00 00 00 " , length 64
+20:59:53.406 TX done......
+20:59:53.422 52 log entries found.
+20:59:53.438 16 bytes written for log entry.
+20:59:53.453 4 bytes written.logcount update successful.
+20:59:53.469 53 log entries found.
+20:59:53.485 16 bytes written for log entry.
+20:59:53.500 4 bytes written.logcount update successful.
+20:59:53.514 54 log entries found.
+20:59:53.531 16 bytes written for log entry.
+20:59:53.546 4 bytes written.logcount update successful.
+20:59:53.561 55 log entries found.
+20:59:53.577 16 bytes written for log entry.
+20:59:53.593 4 bytes written.logcount update successful.
+20:59:53.608 Wrote stats to logger.
+20:59:55.930 air pressure (kPa): 0.00
+20:59:55.947 humidity (%): 41.00
+20:59:55.962 temperature (*C):23.90
+20:59:55.977 Altitude (m): 0.00
+20:59:55.992 56 log entries found.
+20:59:56.008 16 bytes written for log entry.
+20:59:56.024 4 bytes written.logcount update successful.
+20:59:56.038 57 log entries found.
+20:59:56.055 16 bytes written for log entry.
+20:59:56.071 4 bytes written.logcount update successful.
+20:59:56.085 58 log entries found.
+20:59:56.102 16 bytes written for log entry.
+20:59:56.118 4 bytes written.logcount update successful.
+20:59:56.132 59 log entries found.
+20:59:56.147 16 bytes written for log entry.
+20:59:56.163 4 bytes written.logcount update successful.
+20:59:56.178 Logged sensor readings.
+20:59:56.194 
+20:59:56.210 sending packet "00 01 AB 01 06 7B 00 00 06 7B 00 00 33 33 BF 41 00 01 AC 01 06 7B 00 00 61 7B 00 00 00 00 24 42 00 01 AD 01 06 7B 00 00 66 7B 00 00 00 00 00 00 00 01 AE 01 06 7B 00 00 6C 7B 00 00 00 00 00 00 " , length 64
+20:59:56.224 TX done......
+20:59:56.241 60 log entries found.
+20:59:56.257 16 bytes written for log entry.
+20:59:56.272 4 bytes written.logcount update successful.
+20:59:56.286 61 log entries found.
+20:59:56.302 16 bytes written for log entry.
+20:59:56.319 4 bytes written.logcount update successful.
+20:59:56.334 62 log entries found.
+20:59:56.350 16 bytes written for log entry.
+20:59:56.365 4 bytes written.logcount update successful.
+20:59:56.380 63 log entries found.
+20:59:56.396 16 bytes written for log entry.
+20:59:56.412 4 bytes written.logcount update successful.
+20:59:56.427 Wrote stats to logger.
+20:59:58.835 air pressure (kPa): 0.00
+20:59:58.861 humidity (%): 40.80
+20:59:58.877 temperature (*C):23.80
+20:59:58.891 Altitude (m): 0.00
+20:59:58.907 64 log entries found.
+20:59:58.922 16 bytes written for log entry.
+20:59:58.938 4 bytes written.logcount update successful.
+20:59:58.954 65 log entries found.
+20:59:58.969 16 bytes written for log entry.
+20:59:58.985 4 bytes written.logcount update successful.
+20:59:59.000 66 log entries found.
+20:59:59.015 16 bytes written for log entry.
+20:59:59.032 4 bytes written.logcount update successful.
+20:59:59.047 67 log entries found.
+20:59:59.062 16 bytes written for log entry.
+20:59:59.077 4 bytes written.logcount update successful.
+20:59:59.093 Logged sensor readings.
+20:59:59.107 
+20:59:59.124 sending packet "00 01 AB 01 60 86 00 00 60 86 00 00 66 66 BE 41 00 01 AC 01 60 86 00 00 68 86 00 00 33 33 23 42 00 01 AD 01 60 86 00 00 77 86 00 00 00 00 00 00 00 01 AE 01 60 86 00 00 7E 86 00 00 00 00 00 00 " , length 64
+20:59:59.139 TX done......
+20:59:59.154 68 log entries found.
+20:59:59.169 16 bytes written for log entry.
+20:59:59.185 4 bytes written.logcount update successful.
+20:59:59.200 69 log entries found.
+20:59:59.215 16 bytes written for log entry.
+20:59:59.231 4 bytes written.logcount update successful.
+20:59:59.247 70 log entries found.
+20:59:59.262 16 bytes written for log entry.
+20:59:59.277 4 bytes written.logcount update successful.
+20:59:59.293 71 log entries found.
+20:59:59.308 16 bytes written for log entry.
+20:59:59.324 4 bytes written.logcount update successful.
+20:59:59.339 Wrote stats to logger.
+21:00:01.653 air pressure (kPa): 0.00
+21:00:01.680 humidity (%): 41.00
+21:00:01.696 temperature (*C):23.80
+21:00:01.711 Altitude (m): 0.00
+21:00:01.727 72 log entries found.
+21:00:01.742 16 bytes written for log entry.
+21:00:01.758 4 bytes written.logcount update successful.
+21:00:01.773 73 log entries found.
+21:00:01.788 16 bytes written for log entry.
+21:00:01.804 4 bytes written.logcount update successful.
+21:00:01.819 74 log entries found.
+21:00:01.835 16 bytes written for log entry.
+21:00:01.851 4 bytes written.logcount update successful.
+21:00:01.865 75 log entries found.
+21:00:01.881 16 bytes written for log entry.
+21:00:01.896 4 bytes written.logcount update successful.
+21:00:01.912 Logged sensor readings.
+21:00:01.928 
+21:00:01.947 sending packet "00 01 AB 01 61 91 00 00 61 91 00 00 66 66 BE 41 00 01 AC 01 61 91 00 00 68 91 00 00 00 00 24 42 00 01 AD 01 61 91 00 00 79 91 00 00 00 00 00 00 00 01 AE 01 61 91 00 00 7E 91 00 00 00 00 00 00 " , length 64
+21:00:01.960 TX done......
+21:00:01.975 76 log entries found.
+21:00:01.990 16 bytes written for log entry.
+21:00:02.007 4 bytes written.logcount update successful.
+21:00:02.023 77 log entries found.
+21:00:02.039 16 bytes written for log entry.
+21:00:02.055 4 bytes written.logcount update successful.
+21:00:02.070 78 log entries found.
+21:00:02.086 16 bytes written for log entry.
+21:00:02.102 4 bytes written.logcount update successful.
+21:00:02.117 79 log entries found.
+21:00:02.132 16 bytes written for log entry.
+21:00:02.147 4 bytes written.logcount update successful.
+21:00:02.164 Wrote stats to logger.
+21:00:04.458 air pressure (kPa): 0.00
+21:00:04.484 humidity (%): 40.90
+21:00:04.501 temperature (*C):23.90
+21:00:04.515 Altitude (m): 0.00
+21:00:04.530 80 log entries found.
+21:00:04.545 16 bytes written for log entry.
+21:00:04.561 4 bytes written.logcount update successful.
+21:00:04.577 81 log entries found.
+21:00:04.594 16 bytes written for log entry.
+21:00:04.609 4 bytes written.logcount update successful.
+21:00:04.624 82 log entries found.
+21:00:04.639 16 bytes written for log entry.
+21:00:04.656 4 bytes written.logcount update successful.
+21:00:04.671 83 log entries found.
+21:00:04.687 16 bytes written for log entry.
+21:00:04.702 4 bytes written.logcount update successful.
+21:00:04.718 Logged sensor readings.
+21:00:04.734 
+21:00:04.751 sending packet "00 01 AB 01 56 9C 00 00 56 9C 00 00 33 33 BF 41 00 01 AC 01 56 9C 00 00 5D 9C 00 00 9A 99 23 42 00 01 AD 01 56 9C 00 00 6E 9C 00 00 00 00 00 00 00 01 AE 01 56 9C 00 00 73 9C 00 00 00 00 00 00 " , length 64
+21:00:04.765 TX done......
+21:00:04.781 84 log entries found.
+21:00:04.796 16 bytes written for log entry.
+21:00:04.811 4 bytes written.logcount update successful.
+21:00:04.827 85 log entries found.
+21:00:04.844 16 bytes written for log entry.
+21:00:04.860 4 bytes written.logcount update successful.
+21:00:04.874 86 log entries found.
+21:00:04.891 16 bytes written for log entry.
+21:00:04.905 4 bytes written.logcount update successful.
+21:00:04.920 87 log entries found.
+21:00:04.936 16 bytes written for log entry.
+21:00:04.952 4 bytes written.logcount update successful.
+21:00:04.967 Wrote stats to logger.
+21:00:07.274 air pressure (kPa): 0.00
+21:00:07.287 humidity (%): 40.90
+21:00:07.303 temperature (*C):23.80
+21:00:07.335 Altitude (m): 0.00
+21:00:07.350 88 log entries found.
+21:00:07.366 16 bytes written for log entry.
+21:00:07.381 4 bytes written.logcount update successful.
+21:00:07.397 89 log entries found.
+21:00:07.412 16 bytes written for log entry.
+21:00:07.428 4 bytes written.logcount update successful.
+21:00:07.444 90 log entries found.
+21:00:07.459 16 bytes written for log entry.
+21:00:07.475 4 bytes written.logcount update successful.
+21:00:07.491 91 log entries found.
+21:00:07.505 16 bytes written for log entry.
+21:00:07.521 4 bytes written.logcount update successful.
+21:00:07.537 Logged sensor readings.
+21:00:07.552 
+21:00:07.572 sending packet "00 01 AB 01 4B A7 00 00 4B A7 00 00 66 66 BE 41 00 01 AC 01 4B A7 00 00 52 A7 00 00 9A 99 23 42 00 01 AD 01 4B A7 00 00 63 A7 00 00 00 00 00 00 00 01 AE 01 4B A7 00 00 68 A7 00 00 00 00 00 00 " , length 64
+21:00:07.584 TX done......
+21:00:07.599 92 log entries found.
+21:00:07.615 16 bytes written for log entry.
+21:00:07.631 4 bytes written.logcount update successful.
+21:00:07.646 93 log entries found.
+21:00:07.661 16 bytes written for log entry.
+21:00:07.676 4 bytes written.logcount update successful.
+21:00:07.692 94 log entries found.
+21:00:07.709 16 bytes written for log entry.
+21:00:07.724 4 bytes written.logcount update successful.
+21:00:07.739 95 log entries found.
+21:00:07.755 16 bytes written for log entry.
+21:00:07.770 4 bytes written.logcount update successful.
+21:00:07.786 Wrote stats to logger.
+21:00:10.088 air pressure (kPa): 0.00
+21:00:10.104 humidity (%): 41.00
+21:00:10.119 temperature (*C):23.80
+21:00:10.135 Altitude (m): 0.00
+21:00:10.149 96 log entries found.
+21:00:10.166 16 bytes written for log entry.
+21:00:10.180 4 bytes written.logcount update successful.
+21:00:10.196 97 log entries found.
+21:00:10.212 16 bytes written for log entry.
+21:00:10.227 4 bytes written.logcount update successful.
+21:00:10.243 98 log entries found.
+21:00:10.259 16 bytes written for log entry.
+21:00:10.274 4 bytes written.logcount update successful.
+21:00:10.290 99 log entries found.
+21:00:10.305 16 bytes written for log entry.
+21:00:10.320 4 bytes written.logcount update successful.
+21:00:10.335 Logged sensor readings.
+21:00:10.351 
+21:00:10.371 sending packet "00 01 AB 01 4A B2 00 00 4A B2 00 00 66 66 BE 41 00 01 AC 01 4A B2 00 00 51 B2 00 00 00 00 24 42 00 01 AD 01 4A B2 00 00 62 B2 00 00 00 00 00 00 00 01 AE 01 4A B2 00 00 67 B2 00 00 00 00 00 00 " , length 64
+21:00:10.382 TX done......
+21:00:10.397 100 log entries found.
+21:00:10.414 16 bytes written for log entry.
+21:00:10.429 4 bytes written.logcount update successful.
+21:00:10.443 101 log entries found.
+21:00:10.460 16 bytes written for log entry.
+21:00:10.475 4 bytes written.logcount update successful.
+21:00:10.490 102 log entries found.
+21:00:10.507 16 bytes written for log entry.
+21:00:10.522 4 bytes written.logcount update successful.
+21:00:10.538 103 log entries found.
+21:00:10.552 16 bytes written for log entry.
+21:00:10.568 4 bytes written.logcount update successful.
+21:00:10.583 Wrote stats to logger.
