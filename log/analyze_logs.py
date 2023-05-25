@@ -91,6 +91,7 @@ def main(logfile: str):
 
     # Shift time so it starts at 0
     df["Timestamp"] -= df["Timestamp"].min()
+    print("Total benchmark time: ", df["Timestamp"].max())
 
     # Get unique Semantic Values
     unique_semantic_values = df["Semantic Value"].unique()
