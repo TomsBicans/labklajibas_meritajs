@@ -1,5 +1,6 @@
 # Importing required libraries
 from datetime import datetime
+import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from geopy.distance import geodesic
@@ -50,6 +51,9 @@ def plot_distances(df, output_file):
         xytext=(-10, 10),
         ha="center",
     )
+    # Here we adjust the xticks
+    x_ticks = np.arange(df["Relative Time"].min(), df["Relative Time"].max(), 100)
+    ax.set_xticks(x_ticks)
 
     ax.set_title("Overtime Distance from Start Point")
     ax.set_xlabel("Relative Time (seconds)")
