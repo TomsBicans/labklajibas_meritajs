@@ -1,0 +1,5 @@
+python3 .\analyze_logs.py .\tests\1\logs_COM6_115200_administrator_internal1.log .\tests\1\logs_COM6_115200_monitor_internal1.log
+python3 .\analyze_gps.py .\tests\1\gps_test1.csv
+
+python3 .\analyze_logs.py .\tests\2\logs_COM6_115200_administrator_internal2_2023_05_24_21_30_54.log .\tests\2\logs_COM6_115200_monitor_internal2_2023_05_24_21_32_43.log
+python3 .\analyze_gps.py .\tests\2\gps_test2.csv
