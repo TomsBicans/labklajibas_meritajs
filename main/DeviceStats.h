@@ -58,7 +58,7 @@ private:
 
 class ReceiverStats {
 public:
-    static const size_t NUM_SAMPLES = 3;
+    static const size_t NUM_SAMPLES = 2;
     ReceiverStats() 
         : totalPacketsReceived(0), totalBytesReceived(0), rssiIndex(0), snrIndex(0), rssiCount(0), snrCount(0) {
             memset(rssiSamples, 0, sizeof(rssiSamples));
