@@ -3,11 +3,10 @@
 
 class Timer {
   private:
-    unsigned long startTime;  // Timer start time
-    unsigned long interval;  // Timer interval
+    unsigned long startTime;
+    unsigned long interval;
 
   public:
-    // Constructor, takes the timer interval as an argument
     Timer(unsigned long interval);
 
     // Check if the timer interval has elapsed
