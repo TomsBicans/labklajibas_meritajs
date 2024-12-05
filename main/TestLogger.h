@@ -34,7 +34,7 @@ test(logging_int_value) {
 
   uint32_t x_id = millis();
   uint8_t targetDevice = 1;
-  uint8_t originDevice = 2;  // added origin device
+  uint8_t originDevice = 2;
   SemanticValue semanticValue = ERROR_1;
   long int numericValue = 1234;
   
@@ -45,7 +45,7 @@ test(logging_int_value) {
   LogEntry entry = logger.getLog(0);
   assertEqual(entry.x_id, x_id);
   assertEqual(entry.targetDevice, targetDevice);
-  assertEqual(entry.originDevice, originDevice);  // assert origin device
+  assertEqual(entry.originDevice, originDevice);
   assertEqual(entry.semanticValue, semanticValue);
   assertEqual(entry.numericValue.intValue, numericValue);
   assertFalse(entry.isFloat);

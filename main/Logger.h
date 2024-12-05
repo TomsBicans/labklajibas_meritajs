@@ -75,7 +75,7 @@ struct LogEntry {
   
 
   String toString() const {
-    char buffer[512]; // Adjust the buffer size according to your needs
+    char buffer[512]; // Buffer to hold the formatted string
     snprintf(buffer, sizeof(buffer),
              "X_ID: %lu, Target Device: %u, Origin Device: %u, Semantic Value: %u, Timestamp: %lu, Numeric Value: %s, Is Float: %s",
              x_id, targetDevice, originDevice, static_cast<uint8_t>(semanticValue), timestamp,
